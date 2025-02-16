@@ -29,6 +29,31 @@ article, aside, details, figcaption, figure,
 footer, header, hgroup, menu, nav, section {
 	display: block;}
 
+nav {
+    display: flex;
+    justify-content: flex-end;  /* Moves items to the right */
+    background-color: rgb(169, 209, 244);
+    padding: 10px;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    padding: 10px 15px;
+    display: block;
+}
+
+nav ul li a:hover {
+    background-color: #555;
+}
+
 body {
 	line-height: 1;
 }
