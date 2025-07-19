@@ -45,13 +45,14 @@ nav ul {
 
 nav ul li a {
     text-decoration: none;
-    color: white;
+    color: black;
     padding: 10px 15px;
     display: block;
 }
 
 nav ul li a:hover {
-    background-color: #555;
+    background-color: #888;
+    color:black;
 }
 
 body {
