@@ -33,7 +33,13 @@ nav {
     display: flex;
     justify-content: flex-end;  /* Moves items to the right */
     background-color: rgb(169, 209, 244);
-    padding: 10px;
+    padding: 5px 10px;  /* Reduced vertical padding */
+    position: fixed;    /* Makes it sticky */
+    top: 0;            /* Sticks to top of viewport */
+    left: 0;           /* Full width */
+    right: 0;          /* Full width */
+    z-index: 1000;     /* Ensures it stays above other content */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* Adds subtle shadow */
 }
 
 nav ul {
@@ -46,8 +52,9 @@ nav ul {
 nav ul li a {
     text-decoration: none;
     color: black;
-    padding: 10px 15px;
+    padding: 5px 12px;  /* Reduced padding for smaller appearance */
     display: block;
+    font-size: 0.9em;   /* Slightly smaller font size */
 }
 
 nav ul li a:hover {
@@ -177,10 +184,11 @@ input, select, textarea {
 
 		}
 
-	body {
-		background-color: #ffffff;
-		color: #000000;
-	}
+body {
+	background-color: #ffffff;
+	color: #000000;
+	padding-top: 50px;  /* Add space for fixed navigation bar */
+}
 
 	body, input, select, textarea {
 		font-family: "Source Sans Pro", Helvetica, sans-serif;
