@@ -20,6 +20,18 @@
 
   var revealEls = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && revealEls.length) {
+    // Anything already in (or above) the first screen shows instantly, so
+    // there's no blank gap or load-time animation. Only content further
+    // down fades in as you scroll.
+    var pending = [];
+    revealEls.forEach(function (el) {
+      if (el.getBoundingClientRect().top < window.innerHeight) {
+        el.classList.add('reveal-instant', 'is-visible');
+      } else {
+        pending.push(el);
+      }
+    });
+
     var observer = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
@@ -29,9 +41,9 @@
           }
         });
       },
-      { threshold: 0.05, rootMargin: '0px 0px 100px 0px' }
+      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
     );
-    revealEls.forEach(function (el) { observer.observe(el); });
+    pending.forEach(function (el) { observer.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add('is-visible'); });
   }
