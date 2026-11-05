@@ -92,7 +92,8 @@ h1, h2, h3, h4 {
   color: var(--navy-900);
 }
 
-p { margin: 0 0 1.1em; }
+p { margin: 0 0 1.1em; text-wrap: pretty; } /* avoids one-word last lines */
+h1, h2, h3 { text-wrap: balance; }
 p:last-child { margin-bottom: 0; }
 
 .container {
@@ -461,7 +462,7 @@ section.block {
 }
 
 .timeline h3 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 0.15em; }
-.timeline p { color: var(--ink-soft); }
+.timeline p { color: var(--ink-soft); max-width: 72ch; }
 
 .timeline .org-full {
   font-family: var(--font-body);
@@ -493,6 +494,7 @@ section.block {
   font-weight: 400;
   color: var(--ink-soft);
   margin-left: 0.5em;
+  white-space: nowrap; /* keep "2025 – 2026" on one line */
 }
 
 .draft-note {
@@ -689,6 +691,8 @@ section.block {
   color: var(--ink-soft);
   font-size: 0.95rem;
   overflow-wrap: anywhere;
+  max-width: 80ch;
+  text-wrap: pretty;
 }
 .pub-list strong { color: var(--navy-900); }
 .pub-list a { color: var(--navy-800); text-decoration: underline; text-decoration-color: var(--line); }
@@ -775,6 +779,9 @@ section.block {
 }
 
 @media (max-width: 760px) {
+  /* full institution name goes on its own line under the short name */
+  .timeline .org-full { display: block; margin: 0.25em 0 0; }
+  .timeline .role-years { display: block; margin: 0.15em 0 0; }
   .contact-block { flex-direction: column; align-items: stretch; text-align: left; }
   .contact-intro { flex-basis: auto; }
   .paper .fig { float: none; width: 100%; margin: 0 0 1rem; }
