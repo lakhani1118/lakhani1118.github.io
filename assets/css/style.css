@@ -383,7 +383,8 @@ section.block {
   margin-bottom: 2.6rem;
 }
 
-.section-head h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); }
+.section-head h2,
+.about-body h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); }
 .section-head p { color: var(--ink-soft); font-size: 1.02rem; }
 
 .alt-surface { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
@@ -410,6 +411,8 @@ section.block {
 
 .about-body p { color: var(--ink-soft); }
 .about-body p strong { color: var(--ink); }
+/* the lead paragraph is the one most visitors read: darker and a step larger */
+.about-body .lede { color: var(--ink); font-size: 1.12rem; }
 
 /* ---------- Timeline ---------- */
 
@@ -685,7 +688,6 @@ section.block {
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--line);
-  max-width: 59ch; /* ~80 characters per entry; rules end where the text does */
 }
 
 .pub-list li {
