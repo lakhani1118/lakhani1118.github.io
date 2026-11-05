@@ -19,6 +19,13 @@
       link.addEventListener('click', closeMenu);
     });
 
+    // Tapping anywhere outside the nav closes the open menu.
+    document.addEventListener('click', function (e) {
+      if (nav.classList.contains('is-open') && !nav.contains(e.target)) {
+        closeMenu();
+      }
+    });
+
     // Escape closes the open menu and returns focus to the button.
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && nav.classList.contains('is-open')) {

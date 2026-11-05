@@ -105,7 +105,7 @@ p:last-child { margin-bottom: 0; }
 
 .eyebrow {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start; /* when it wraps on phones, the dash stays on the first line */
   gap: 0.5em;
   font-family: var(--font-body);
   font-size: 0.78rem;
@@ -120,6 +120,8 @@ p:last-child { margin-bottom: 0; }
   content: '';
   width: 1.6em;
   height: 2px;
+  flex: none;
+  margin-top: calc(0.825em - 1px); /* centre of the first line (line-height 1.65) */
   background: var(--gold);
   display: inline-block;
 }
@@ -502,6 +504,22 @@ section.block {
   white-space: nowrap; /* keep "2025 – 2026" on one line */
 }
 
+/* Desktop: the heading holds the left column while the timeline runs down the right,
+   so the section uses the container's width instead of leaving half of it empty */
+@media (min-width: 1024px) {
+  .experience-grid {
+    display: grid;
+    grid-template-columns: minmax(16rem, 1fr) minmax(0, 1.75fr);
+    column-gap: 4.5rem;
+    align-items: start;
+  }
+  .experience-grid .section-head {
+    position: sticky;
+    top: calc(72px + 2.5rem); /* clears the sticky nav */
+    margin-bottom: 0;
+  }
+}
+
 .draft-note {
   font-style: italic;
   color: var(--ink-soft);
@@ -767,8 +785,11 @@ section.block {
 
 /* Nav collapses earlier than the rest: below ~820px the full link row collides */
 @media (max-width: 860px) {
-  .nav-links, .nav-cta .btn-outline { display: none; }
+  .nav-links { display: none; }
   .nav-toggle { display: flex; }
+  /* The CV stays in the sticky bar on phones, just more compact */
+  .nav-cta { gap: 0.5rem; }
+  .nav-cta .btn-outline { font-size: 0.9rem; padding: 0.5em 1.05em; min-height: 40px; }
   .site-nav.is-open .nav-links {
     display: flex;
     flex-direction: column;
@@ -778,9 +799,17 @@ section.block {
     right: 0;
     background: var(--cream);
     border-bottom: 1px solid var(--line);
-    padding: 1.5rem;
-    gap: 1.2rem;
+    padding: 0.75rem 1.5rem;
+    gap: 0;
+    align-items: stretch;
+    text-align: center;
   }
+  .site-nav.is-open .nav-links a { display: block; padding: 0.7rem 0; } /* full-width, ~47px tap rows */
+}
+
+/* Smallest phones: drop the monogram so the name and CV button keep breathing room */
+@media (max-width: 360px) {
+  .brand-mark { display: none; }
 }
 
 @media (max-width: 760px) {
@@ -797,5 +826,8 @@ section.block {
   .paper { padding: 1.4rem; }
   .contact-block { padding: calc(2.4rem + var(--wave-h)) 1.6rem 2.4rem; }
   .hero { --wave-h: 28px; }
+  /* the two hero buttons stack; give them one shared width instead of two ragged ones */
+  .hero-actions .btn { flex: 1 1 100%; justify-content: center; }
+  .hero-contacts { gap: 0.6rem 1.4rem; }
   .hero .container { padding: 2.5rem 1.5rem calc(2.5rem + var(--wave-h)); }
 }
