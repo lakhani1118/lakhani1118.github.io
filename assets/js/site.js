@@ -28,7 +28,7 @@
     });
   }
 
-  var revealEls = document.querySelectorAll('.reveal');
+  var revealEls = document.querySelectorAll('.reveal, .timeline');
   if ('IntersectionObserver' in window && revealEls.length) {
     // Anything already in (or above) the first screen shows instantly, so
     // there's no blank gap or load-time animation. Only content further

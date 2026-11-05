@@ -432,10 +432,22 @@ section.block.tight { padding: 4rem 0; }
 /* ---------- Timeline ---------- */
 
 .timeline {
+  position: relative;
   list-style: none;
   margin: 0;
-  padding: 0;
-  border-left: 2px solid var(--line);
+  padding: 0 0 0 2px; /* room for the 2px line drawn by ::before */
+}
+
+/* The vertical line of the timeline (drawn in on scroll; see Motion below) */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--line);
+  transform-origin: top;
 }
 
 .timeline li {
@@ -691,18 +703,57 @@ section.block.tight { padding: 4rem 0; }
 
 /* ---------- Reveal animation ---------- */
 
-/* Content is only hidden for the fade-in when JavaScript is running
-   (the `js` class is set in the <head>), so it stays visible without it. */
+/* ---------- Motion ----------
+   One authored moment: the career timeline traces itself in (line draws down,
+   stops arrive in order). The photo gallery arrives as a row-staggered group.
+   Everything else is static. Content is only hidden for these entrances when
+   JavaScript is running (the `js` class is set in <head>), and site.js marks
+   anything already on screen at load as `reveal-instant`, so nothing waits. */
+
+:root { --ease-out: cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Timeline: the focal sequence */
+.js .timeline::before { transition: transform 800ms var(--ease-out); }
+.js .timeline:not(.is-visible)::before { transform: scaleY(0); }
+
+.js .timeline > li { transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out); }
+.js .timeline:not(.is-visible) > li { opacity: 0; transform: translateY(10px); }
+.js .timeline > li:nth-child(2) { transition-delay: 150ms; }
+.js .timeline > li:nth-child(3) { transition-delay: 300ms; }
+.js .timeline > li:nth-child(4) { transition-delay: 450ms; }
+
+/* Gallery tiles: a short left-to-right stagger within each row */
 .js .reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
 }
-.js .reveal.is-visible { opacity: 1; transform: translateY(0); }
-.js .reveal.reveal-instant { transition: none; }
+.js .reveal:not(.is-visible) { opacity: 0; transform: translateY(14px); }
+.js .beyond-photo.reveal:nth-child(3n + 2) { transition-delay: 70ms; }
+.js .beyond-photo.reveal:nth-child(3n) { transition-delay: 140ms; }
+
+.js .reveal-instant,
+.js .reveal-instant::before,
+.js .reveal-instant > li { transition: none !important; }
+
+/* Reduced motion: no travel, drawing or zooming; short fades and colour
+   feedback stay so state changes are still visible. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .js .timeline::before { transform: none !important; transition: none; }
+  .js .timeline:not(.is-visible) > li,
+  .js .reveal:not(.is-visible) { transform: none; }
+  .js .timeline > li,
+  .js .reveal { transition: opacity 250ms ease-out; transition-delay: 0s !important; }
+
+  .btn:hover,
+  .contact-icons a:hover { transform: none; }
+  .beyond-photo img { transition: filter 200ms ease-out; }
+  .beyond-photo:hover img { transform: none; filter: brightness(1.06); }
+}
 
 @media print {
-  .js .reveal { opacity: 1; transform: none; }
+  .js .reveal, .js .timeline > li { opacity: 1 !important; transform: none !important; }
+  .js .timeline::before { transform: none !important; }
   .site-nav, .skip-link { display: none; }
 }
 
