@@ -267,20 +267,41 @@ p:last-child { margin-bottom: 0; }
 .hero-bg {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(155deg, rgba(7, 15, 30, 0.92) 10%, rgba(13, 28, 52, 0.75) 55%, rgba(47, 109, 104, 0.55) 100%), url('../../images/Beach.jpg');
+  /* Wide screens: dark behind the text column (left), opening up to show the
+     water on the right, with a teal cast where the sea is. */
+  background-image:
+    linear-gradient(90deg, rgba(7, 15, 30, 0.9) 0%, rgba(7, 15, 30, 0.84) 50%, rgba(13, 28, 52, 0.45) 72%, rgba(13, 28, 52, 0.12) 100%),
+    linear-gradient(180deg, rgba(47, 109, 104, 0) 35%, rgba(47, 109, 104, 0.35) 100%),
+    url('../../images/Beach.jpg');
   background-size: cover;
   background-position: center 65%;
   z-index: 0;
 }
 
+/* Narrow screens: text spans the whole card, so keep the full dark overlay */
+@media (max-width: 860px) {
+  .hero-bg {
+    background-image: linear-gradient(155deg, rgba(7, 15, 30, 0.92) 10%, rgba(13, 28, 52, 0.8) 55%, rgba(47, 109, 104, 0.6) 100%), url('../../images/Beach.jpg');
+  }
+}
+
 .hero .container {
   position: relative;
   z-index: 1;
-  padding: 4rem 3rem;
+  padding: 4rem 3rem calc(4rem + var(--wave-h));
 }
 
-/* the wave only made sense when the hero ran full-bleed */
-.hero .wave-divider { display: none; }
+/* The wave is the hero card's bottom edge: page colour cut into the photo */
+.hero { --wave-h: 44px; border-radius: 24px 24px 0 0; } /* the wave is the bottom edge */
+.hero .wave-divider {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  margin: 0;
+  color: var(--cream);
+}
+.hero .wave-divider svg { height: var(--wave-h); }
 
 .hero-content { max-width: 640px; }
 
@@ -347,7 +368,8 @@ p:last-child { margin-bottom: 0; }
   z-index: 1;
   margin-top: -6px;
 }
-.wave-divider svg { width: 100%; height: 64px; display: block; }
+.wave-divider svg { width: 100%; height: 64px; display: block; fill: currentColor; }
+
 
 /* ---------- Sections (general) ---------- */
 
@@ -547,43 +569,58 @@ section.block {
   overflow: hidden;
 }
 
-.contact-block::after {
-  content: '';
+/* The page ends where it began: the hero's wave, mirrored, as the panel's top edge */
+.contact-block { --wave-h: 36px; padding-top: calc(3.4rem + var(--wave-h)); border-radius: 0 0 24px 24px; } /* the wave is the top edge */
+.contact-block .wave-divider {
   position: absolute;
-  right: -60px;
-  top: -60px;
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(201, 162, 77, 0.35), transparent 70%);
+  left: 0;
+  right: 0;
+  top: -1px;
+  margin: 0;
+  color: var(--cream);
+  transform: scaleY(-1);
+}
+.contact-block .wave-divider svg { height: var(--wave-h); }
+
+.contact-intro { flex: 1 1 26rem; }
+
+.contact-block h2 {
+  color: var(--cream);
+  font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+  margin-bottom: 0.45em;
 }
 
-.contact-block h2 { color: var(--cream); margin-bottom: 0.3em; }
-.contact-block p { color: var(--on-dark-text); max-width: 42ch; }
-
-.contact-icons {
-  display: flex;
-  gap: 0.9rem;
-  list-style: none;
+.contact-lede {
   margin: 0;
-  padding: 0;
+  max-width: 42ch;
+  font-size: 1.08rem;
+  color: var(--on-dark-text);
+}
+
+.contact-actions {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.9rem;
   position: relative;
   z-index: 1;
 }
 
-.contact-icons a {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 1px solid var(--on-dark-line);
+.btn-lg { font-size: 1rem; padding: 0.95em 1.7em; justify-content: center; }
+
+.contact-tertiary {
+  align-self: center;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: var(--cream);
-  transition: background 0.15s ease, transform 0.15s ease;
+  gap: 0.5em;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.92rem;
+  color: var(--on-dark-text);
+  text-decoration: underline;
+  text-decoration-color: var(--on-dark-line);
 }
-.contact-icons a:hover { background: var(--gold); color: var(--navy-950); transform: translateY(-2px); }
+.contact-tertiary:hover { color: var(--cream); text-decoration-color: var(--gold); }
 
 /* ---------- Footer ---------- */
 
@@ -701,8 +738,7 @@ section.block {
   .js .timeline > li,
   .js .reveal { transition: opacity 250ms ease-out; transition-delay: 0s !important; }
 
-  .btn:hover,
-  .contact-icons a:hover { transform: none; }
+  .btn:hover { transform: none; }
   .beyond-photo img { transition: filter 200ms ease-out; }
   .beyond-photo:hover img { transform: none; filter: brightness(1.06); }
 }
@@ -739,12 +775,14 @@ section.block {
 }
 
 @media (max-width: 760px) {
-  .contact-block { flex-direction: column; align-items: flex-start; text-align: left; }
+  .contact-block { flex-direction: column; align-items: stretch; text-align: left; }
+  .contact-intro { flex-basis: auto; }
   .paper .fig { float: none; width: 100%; margin: 0 0 1rem; }
   section.block { padding: 3.6rem 0; }
 }
 
 @media (max-width: 480px) {
-  .contact-block { padding: 2.4rem 1.6rem; }
-  .hero .container { padding: 2.5rem 1.5rem; }
+  .contact-block { padding: calc(2.4rem + var(--wave-h)) 1.6rem 2.4rem; }
+  .hero { --wave-h: 28px; }
+  .hero .container { padding: 2.5rem 1.5rem calc(2.5rem + var(--wave-h)); }
 }
