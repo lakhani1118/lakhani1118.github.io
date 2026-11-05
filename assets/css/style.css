@@ -38,10 +38,37 @@ body {
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 17px;
+  font-size: 1.0625rem; /* 17px at default settings; follows the visitor's browser font size */
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Keyboard focus: one ring from the palette; light gold on the dark hero and contact panels */
+:focus-visible {
+  outline: 2px solid var(--teal-deep);
+  outline-offset: 3px;
+}
+.hero :focus-visible,
+.contact-block :focus-visible { outline-color: var(--gold-light); }
+
+/* Anchored sections land below the sticky nav */
+main, section[id] { scroll-margin-top: 72px; }
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 0;
+  z-index: 100;
+  transform: translateY(-120%);
+  padding: 0.6em 1.1em;
+  border-radius: 0 0 10px 10px;
+  background: var(--navy-900);
+  color: var(--cream);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+.skip-link:focus { transform: translateY(0); }
 
 img { max-width: 100%; height: auto; display: block; }
 
@@ -231,6 +258,11 @@ p:last-child { margin-bottom: 0; }
 .nav-toggle {
   display: none;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px; /* keep the bars aligned with the content edge */
   gap: 5px;
   background: none;
   border: none;
@@ -659,13 +691,20 @@ section.block.tight { padding: 4rem 0; }
 
 /* ---------- Reveal animation ---------- */
 
-.reveal {
+/* Content is only hidden for the fade-in when JavaScript is running
+   (the `js` class is set in the <head>), so it stays visible without it. */
+.js .reveal {
   opacity: 0;
   transform: translateY(18px);
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
-.reveal.is-visible { opacity: 1; transform: translateY(0); }
-.reveal.reveal-instant { transition: none; }
+.js .reveal.is-visible { opacity: 1; transform: translateY(0); }
+.js .reveal.reveal-instant { transition: none; }
+
+@media print {
+  .js .reveal { opacity: 1; transform: none; }
+  .site-nav, .skip-link { display: none; }
+}
 
 /* ---------- Responsive ---------- */
 
@@ -674,7 +713,8 @@ section.block.tight { padding: 4rem 0; }
   .about-photo { max-width: 340px; margin: 0 auto; }
 }
 
-@media (max-width: 760px) {
+/* Nav collapses earlier than the rest: below ~820px the full link row collides */
+@media (max-width: 860px) {
   .nav-links, .nav-cta .btn-outline { display: none; }
   .nav-toggle { display: flex; }
   .site-nav.is-open .nav-links {
@@ -689,6 +729,9 @@ section.block.tight { padding: 4rem 0; }
     padding: 1.5rem;
     gap: 1.2rem;
   }
+}
+
+@media (max-width: 760px) {
   .contact-block { flex-direction: column; align-items: flex-start; text-align: left; }
   .paper .fig { float: none; width: 100%; margin: 0 0 1rem; }
   section.block { padding: 3.6rem 0; }

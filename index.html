@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
+	<script>document.documentElement.classList.add('js');</script>
 	<title>Karim Lakhani, PhD</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Karim Lakhani, PhD — paleoceanographer turned forward deployed scientist. Senior Forward Deployed Scientist at Albert Invent, leading enterprise technical implementations for scientific R&amp;D teams. PhD from Georgia Tech's School of Earth and Atmospheric Sciences." />
@@ -36,10 +37,12 @@
 		<symbol id="i-instagram" viewBox="0 0 448 512"><path transform="matrix(1 0 0 -1 0 448)" d="M224.1 307c63.6006 0 114.9 -51.2998 114.9 -114.9c0 -63.5996 -51.2998 -114.899 -114.9 -114.899c-63.5996 0 -114.899 51.2998 -114.899 114.899c0 63.6006 51.2998 114.9 114.899 114.9zM224.1 117.4c41.1006 0 74.7002 33.5 74.7002 74.6992 c0 41.2002 -33.5 74.7002 -74.7002 74.7002c-41.1992 0 -74.6992 -33.5 -74.6992 -74.7002c0 -41.1992 33.5996 -74.6992 74.6992 -74.6992zM370.5 311.7c0 -14.9004 -12 -26.7998 -26.7998 -26.7998c-14.9004 0 -26.7998 12 -26.7998 26.7998s12 26.7998 26.7998 26.7998 s26.7998 -12 26.7998 -26.7998zM446.6 284.5c2.10059 -37 2.10059 -147.8 0 -184.8c-1.7998 -35.9004 -10 -67.7002 -36.1992 -93.9004c-26.2002 -26.2998 -58 -34.5 -93.9004 -36.2002c-37 -2.09961 -147.9 -2.09961 -184.9 0 c-35.8994 1.80078 -67.5996 10 -93.8994 36.2002s-34.5 58 -36.2002 93.9004c-2.09961 37 -2.09961 147.899 0 184.899c1.7998 35.9004 9.90039 67.7002 36.2002 93.9004s58.0996 34.4004 93.8994 36.0996c37 2.10059 147.9 2.10059 184.9 0 c35.9004 -1.7998 67.7002 -10 93.9004 -36.1992c26.2998 -26.2002 34.5 -58 36.1992 -93.9004zM398.8 60c11.7002 29.4004 9 99.5 9 132.1c0 32.6006 2.7002 102.601 -9 132.101c-7.89941 19.7002 -23 34.7998 -42.5996 42.5996c-29.4004 11.6006 -99.5 9 -132.101 9 c-32.5996 0 -102.6 2.7002 -132.1 -9c-19.7002 -7.89941 -34.7998 -23 -42.5996 -42.5996c-11.6006 -29.4004 -9 -99.5 -9 -132.101c0 -32.5996 -2.7002 -102.6 9 -132.1c7.89941 -19.7002 23 -34.7998 42.5996 -42.5996c29.4004 -11.6006 99.5 -9 132.1 -9 c32.6006 0 102.601 -2.7002 132.101 9c19.7002 7.89941 34.7998 23 42.5996 42.5996z"/></symbol>
 	</svg>
 
+	<a class="skip-link" href="#main">Skip to content</a>
+
 	<nav class="site-nav">
 		<div class="container">
 			<a href="index.html" class="brand"><span class="brand-mark">KL</span> Karim Lakhani</a>
-			<ul class="nav-links">
+			<ul class="nav-links" id="nav-links">
 				<li><a href="index.html#about">About</a></li>
 				<li><a href="index.html#experience">Experience</a></li>
 				<li><a href="index.html#research">Research</a></li>
@@ -48,12 +51,14 @@
 			</ul>
 			<div class="nav-cta">
 				<a href="files/Lakhani_CV.pdf" class="btn btn-outline" target="_blank" rel="noopener">CV</a>
-				<button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+				<button class="nav-toggle" aria-label="Menu" aria-controls="nav-links" aria-expanded="false">
 					<span></span><span></span><span></span>
 				</button>
 			</div>
 		</div>
 	</nav>
+
+	<main id="main">
 
 	<!-- Hero -->
 	<header class="hero">
@@ -84,7 +89,7 @@
 		<div class="container">
 			<div class="about-grid">
 				<div class="about-body reveal">
-					<p class="eyebrow">About me</p>
+					<h2 class="eyebrow">About me</h2>
 					<p>I'm a geochemistry Ph.D. graduate from the School of Earth and Atmospheric Sciences at Georgia Tech. My research used planktonic foraminiferal geochemistry to reconstruct ocean density and surface winds on glacial timescales &ndash; understanding how the ocean-atmosphere system has changed in the geologic past is vital for projecting how it will respond to anthropogenic forcing.</p>
 					<p>I tackled this problem with statistical modeling and data science techniques, compiling isotope data from existing sources and generating new data from coretop and Last Glacial Maximum sediments.</p>
 					<p>Since then, my work has been at the intersection of software and the people relying on it. At Epic, I helped medical records teams keep patient records accurate and running smoothly across entire hospital networks. Today, as a Senior Forward Deployed Scientist at <strong>Albert Invent</strong>, I embed with R&amp;D organizations to translate their scientific workflows into a platform they actually use &ndash; owning complex enterprise implementations end to end, stepping into engineering, scientific, and engagement roles as needed.</p>
@@ -193,63 +198,63 @@
 			</div>
 			<div class="beyond-grid">
 				<!-- To add a photo: copy one <a class="beyond-photo"> tile below, then change the image, caption, and Instagram post link. Tiles are ordered newest first. Resize each new photo to about 800px on its short side (aim for under ~200 KB) and set the img width/height to the resized size. -->
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/DcVKm9ilOPY/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/DcVKm9ilOPY/" target="_blank" rel="noopener">
 					<img src="images/Huckleberry Scones.jpg" width="800" height="1422" loading="lazy" decoding="async" alt="Huckleberry scones baked in a cast-iron scone pan" />
 					<span class="photo-caption">
 						<strong>Huckleberry Scones</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/DbPCyTEP66U/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/DbPCyTEP66U/" target="_blank" rel="noopener">
 					<img src="images/Tortilla chips.jpg" width="800" height="1422" loading="lazy" decoding="async" alt="Fried tortilla chips in a bowl with salsa and salt" style="object-position: 50% 60%;" />
 					<span class="photo-caption">
 						<strong>Tortilla Chips</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/DVhkiN4GhvE/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/DVhkiN4GhvE/" target="_blank" rel="noopener">
 					<img src="images/Dumplings.jpg" width="800" height="1067" loading="lazy" decoding="async" alt="A bowl of homemade dumplings" style="object-position: 50% 78%;" />
 					<span class="photo-caption">
 						<strong>Dumplings</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CfIK7XEOhu4/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CfIK7XEOhu4/" target="_blank" rel="noopener">
 					<img src="images/Blueberry plant.jpg" width="800" height="1067" loading="lazy" decoding="async" alt="A ripening blueberry on a potted blueberry plant" style="object-position: 50% 14%;" />
 					<span class="photo-caption">
 						<strong>Blueberry Plant</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CcYwo87uSkr/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CcYwo87uSkr/" target="_blank" rel="noopener">
 					<img src="images/Deep Dish Pizza Muffins.jpg" width="800" height="1000" loading="lazy" decoding="async" alt="Deep dish pizza muffins topped with parmesan and herbs" style="object-position: 50% 75%;" />
 					<span class="photo-caption">
 						<strong>Deep Dish Pizza Muffins</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CWB4jPspBcl/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CWB4jPspBcl/" target="_blank" rel="noopener">
 					<img src="images/Aebleskiver.jpg" width="800" height="1000" loading="lazy" decoding="async" alt="&AElig;bleskiver dusted with powdered sugar" />
 					<span class="photo-caption">
 						<strong>&AElig;bleskiver</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CABv86lHpkf/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/CABv86lHpkf/" target="_blank" rel="noopener">
 					<img src="images/Biscuits.jpg" width="800" height="1067" loading="lazy" decoding="async" alt="A flaky, golden homemade biscuit on a baking sheet" style="object-position: 50% 20%;" />
 					<span class="photo-caption">
 						<strong>Biscuits</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/B9qQ2VCHKqn/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/B9qQ2VCHKqn/" target="_blank" rel="noopener">
 					<img src="images/Macarons.jpg" width="800" height="1007" loading="lazy" decoding="async" alt="A stack of macarons on a slate board" style="object-position: 50% 5%;" />
 					<span class="photo-caption">
 						<strong>Macarons</strong>
 						<span>View on Instagram &rarr;</span>
 					</span>
 				</a>
-				<a class="beyond-photo reveal" href="https://www.instagram.com/p/B8UHZUkH-cN/" target="_blank" rel="noopener" aria-label="View this post on Instagram">
+				<a class="beyond-photo reveal" href="https://www.instagram.com/p/B8UHZUkH-cN/" target="_blank" rel="noopener">
 					<img src="images/Mocha Truffle Cheesecake.jpg" width="800" height="1067" loading="lazy" decoding="async" alt="Mocha truffle cheesecake dusted with cocoa" style="object-position: 50% 100%;" />
 					<span class="photo-caption">
 						<strong>Mocha Truffle Cheesecake</strong>
@@ -277,6 +282,8 @@
 			</div>
 		</div>
 	</section>
+
+	</main>
 
 	<footer class="site-footer">
 		<div class="container">

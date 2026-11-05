@@ -10,11 +10,21 @@
       toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
 
+    var closeMenu = function () {
+      nav.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+
     document.querySelectorAll('.nav-links a').forEach(function (link) {
-      link.addEventListener('click', function () {
-        nav.classList.remove('is-open');
-        toggle.setAttribute('aria-expanded', 'false');
-      });
+      link.addEventListener('click', closeMenu);
+    });
+
+    // Escape closes the open menu and returns focus to the button.
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+        closeMenu();
+        toggle.focus();
+      }
     });
   }
 
