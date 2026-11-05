@@ -3,7 +3,6 @@
    Custom stylesheet (replaces the HTML5UP "Story" theme on this branch)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   --navy-950: #070f1e;
@@ -44,7 +43,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* Inline SVG icons (see sprite at top of index.html) */
+.icon { display: inline-block; fill: currentColor; vertical-align: -0.125em; flex: none; overflow: visible; }
 
 a { color: inherit; }
 
@@ -324,7 +326,7 @@ p:last-child { margin-bottom: 0; }
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 .hero-contacts a:hover { color: var(--cream); border-color: var(--gold); }
-.hero-contacts i { color: var(--gold-light); }
+.hero-contacts .icon { color: var(--gold-light); }
 
 .hero-actions {
   display: flex;
