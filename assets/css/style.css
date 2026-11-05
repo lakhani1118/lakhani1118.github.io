@@ -1,8 +1,7 @@
 /* ==========================================================================
    Karim Lakhani — personal site
-   Custom stylesheet (replaces the HTML5UP "Story" theme on this branch)
+   Custom stylesheet
    ========================================================================== */
-
 
 :root {
   --navy-950: #070f1e;
@@ -19,6 +18,12 @@
   --ink-soft: #51607a;
   --line: #e4ddc9;
   --surface: #ffffff;
+
+  /* Text and lines on the dark hero / contact panels */
+  --cream-rgb: 250 246 238;
+  --on-dark-text: rgb(var(--cream-rgb) / 0.86);
+  --on-dark-line: rgb(var(--cream-rgb) / 0.38);
+  --gold-underline: rgb(232 217 173 / 0.5);
 
   --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -75,7 +80,9 @@ img { max-width: 100%; height: auto; display: block; }
 /* Inline SVG icons (see sprite at top of index.html) */
 .icon { display: inline-block; fill: currentColor; vertical-align: -0.125em; flex: none; overflow: visible; }
 
-a { color: inherit; }
+a { color: inherit; text-underline-offset: 0.18em; }
+
+::selection { background: var(--gold-light); color: var(--navy-950); }
 
 h1, h2, h3, h4 {
   font-family: var(--font-display);
@@ -143,11 +150,11 @@ p:last-child { margin-bottom: 0; }
 .btn-primary:hover { background: var(--gold-light); }
 
 .btn-ghost {
-  background: rgba(250, 246, 238, 0.08);
-  border-color: rgba(250, 246, 238, 0.4);
+  background: rgb(var(--cream-rgb) / 0.08);
+  border-color: var(--on-dark-line);
   color: var(--cream);
 }
-.btn-ghost:hover { background: rgba(250, 246, 238, 0.16); }
+.btn-ghost:hover { background: rgb(var(--cream-rgb) / 0.16); }
 
 .btn-outline {
   background: transparent;
@@ -156,47 +163,13 @@ p:last-child { margin-bottom: 0; }
 }
 .btn-outline:hover { background: var(--navy-900); color: var(--cream); }
 
-.tag-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6em;
-  margin: 1.4em 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.tag {
-  font-size: 0.82rem;
-  font-weight: 600;
-  padding: 0.4em 0.9em;
-  border-radius: 999px;
-  background: var(--cream-dim);
-  border: 1px solid var(--line);
-  color: var(--navy-800);
-}
-
-.draft-badge {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.3em 0.7em;
-  border-radius: 999px;
-  background: rgba(79, 157, 149, 0.14);
-  color: var(--teal-deep);
-  border: 1px dashed var(--teal);
-  margin-left: 0.75em;
-  vertical-align: middle;
-}
-
 /* ---------- Nav ---------- */
 
 .site-nav {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250, 246, 238, 0.85);
+  background: rgb(var(--cream-rgb) / 0.85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
@@ -250,8 +223,7 @@ p:last-child { margin-bottom: 0; }
   transition: color 0.15s ease;
 }
 
-.nav-links a:hover,
-.nav-links a.is-active { color: var(--navy-900); }
+.nav-links a:hover { color: var(--navy-900); }
 
 .nav-cta { display: flex; align-items: center; gap: 1rem; }
 
@@ -329,15 +301,15 @@ p:last-child { margin-bottom: 0; }
   margin-bottom: 1em;
 }
 
-.hero .role a { color: inherit; text-decoration: underline; text-decoration-color: rgba(232, 217, 173, 0.5); }
+.hero .role a { color: inherit; text-decoration: underline; text-decoration-color: var(--gold-underline); }
 
 .hero-tagline {
   font-size: 1.05rem;
-  color: rgba(250, 246, 238, 0.86);
+  color: var(--on-dark-text);
   max-width: 54ch;
 }
 
-.hero-tagline a { color: var(--gold-light); text-decoration: underline; text-decoration-color: rgba(232, 217, 173, 0.5); }
+.hero-tagline a { color: var(--gold-light); text-decoration: underline; text-decoration-color: var(--gold-underline); }
 .hero-tagline a:hover { text-decoration-color: var(--gold-light); }
 
 .hero-contacts {
@@ -353,7 +325,7 @@ p:last-child { margin-bottom: 0; }
   gap: 0.5em;
   text-decoration: none;
   font-size: 0.92rem;
-  color: rgba(250, 246, 238, 0.85);
+  color: var(--on-dark-text);
   border-bottom: 1px solid transparent;
   transition: border-color 0.15s ease, color 0.15s ease;
 }
@@ -382,8 +354,6 @@ p:last-child { margin-bottom: 0; }
 section.block {
   padding: 5.5rem 0;
 }
-
-section.block.tight { padding: 4rem 0; }
 
 .section-head {
   max-width: 640px;
@@ -417,17 +387,6 @@ section.block.tight { padding: 4rem 0; }
 
 .about-body p { color: var(--ink-soft); }
 .about-body p strong { color: var(--ink); }
-
-.pull-note {
-  margin-top: 1.8rem;
-  padding: 1.2rem 1.4rem;
-  border-left: 3px solid var(--gold);
-  background: var(--cream-dim);
-  border-radius: 0 10px 10px 0;
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  color: var(--navy-800);
-}
 
 /* ---------- Timeline ---------- */
 
@@ -469,8 +428,6 @@ section.block.tight { padding: 4rem 0; }
   box-shadow: 0 0 0 2px var(--gold);
 }
 
-.timeline li.is-draft::before { background: var(--cream); box-shadow: 0 0 0 2px var(--teal); }
-
 .timeline .when {
   font-size: 0.82rem;
   font-weight: 700;
@@ -509,13 +466,12 @@ section.block.tight { padding: 4rem 0; }
   border-left: 2px solid var(--gold);
 }
 .timeline .role:first-of-type { margin-top: 0.6rem; }
-.timeline .role-detail,
+
 .timeline .role-years {
   font-weight: 400;
   color: var(--ink-soft);
   margin-left: 0.5em;
 }
-.timeline .role-detail { font-size: 0.85rem; }
 
 .draft-note {
   font-style: italic;
@@ -603,7 +559,7 @@ section.block.tight { padding: 4rem 0; }
 }
 
 .contact-block h2 { color: var(--cream); margin-bottom: 0.3em; }
-.contact-block p { color: rgba(250, 246, 238, 0.78); max-width: 42ch; }
+.contact-block p { color: var(--on-dark-text); max-width: 42ch; }
 
 .contact-icons {
   display: flex;
@@ -619,7 +575,7 @@ section.block.tight { padding: 4rem 0; }
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  border: 1px solid rgba(250, 246, 238, 0.35);
+  border: 1px solid var(--on-dark-line);
   display: inline-flex;
   align-items: center;
   justify-content: center;
