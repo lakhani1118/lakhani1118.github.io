@@ -461,8 +461,9 @@ section.block {
   display: block;
 }
 
-.timeline h3 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 0.15em; }
-.timeline p { color: var(--ink-soft); max-width: 72ch; }
+/* Timeline type roles: dates (metadata) → employer/school (serif) → job title or degree (the line recruiters scan for) */
+.timeline h3 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.005em; margin-bottom: 0.2em; }
+.timeline p { color: var(--ink-soft); max-width: 56ch; } /* ~72 characters in Inter */
 
 .timeline .org-full {
   font-family: var(--font-body);
@@ -478,10 +479,10 @@ section.block {
 
 .timeline .role-title {
   font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--teal-deep);
-  margin-bottom: 0.5em;
+  font-size: 1.06rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.4em;
 }
 .timeline .role {
   margin-top: 1rem;
@@ -491,6 +492,7 @@ section.block {
 .timeline .role:first-of-type { margin-top: 0.6rem; }
 
 .timeline .role-years {
+  font-size: 0.9em;
   font-weight: 400;
   color: var(--ink-soft);
   margin-left: 0.5em;
@@ -683,6 +685,7 @@ section.block {
   margin: 0;
   padding: 0;
   border-top: 1px solid var(--line);
+  max-width: 59ch; /* ~80 characters per entry; rules end where the text does */
 }
 
 .pub-list li {
@@ -691,7 +694,6 @@ section.block {
   color: var(--ink-soft);
   font-size: 0.95rem;
   overflow-wrap: anywhere;
-  max-width: 80ch;
   text-wrap: pretty;
 }
 .pub-list strong { color: var(--navy-900); }
