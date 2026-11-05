@@ -24,6 +24,8 @@
   --on-dark-text: rgb(var(--cream-rgb) / 0.86);
   --on-dark-line: rgb(var(--cream-rgb) / 0.38);
   --gold-underline: rgb(232 217 173 / 0.5);
+  /* Links in body text on light surfaces: muted gold underline, full gold on hover */
+  --link-underline: rgb(201 162 77 / 0.6);
 
   --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -80,7 +82,24 @@ img { max-width: 100%; height: auto; display: block; }
 /* Inline SVG icons (see sprite at top of index.html) */
 .icon { display: inline-block; fill: currentColor; vertical-align: -0.125em; flex: none; overflow: visible; }
 
-a { color: inherit; text-underline-offset: 0.18em; }
+a {
+  color: inherit;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--link-underline);
+}
+a:hover { text-decoration-color: var(--gold); }
+
+/* Screen readers hear that a link opens a new tab; sighted visitors see nothing extra */
+a[target="_blank"]::after {
+  content: " (opens in new tab)";
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 ::selection { background: var(--gold-light); color: var(--navy-950); }
 
@@ -333,8 +352,10 @@ p:last-child { margin-bottom: 0; }
   max-width: 54ch;
 }
 
-.hero-tagline a { color: var(--gold-light); text-decoration: underline; text-decoration-color: var(--gold-underline); }
-.hero-tagline a:hover { text-decoration-color: var(--gold-light); }
+/* Desktop: the card fills the first screen, with the same 1.5rem gap below it as above */
+@media (min-width: 861px) {
+  .hero { min-height: min(calc(100svh - 72px - 3rem), 860px); }
+}
 
 .hero-contacts {
   display: flex;
@@ -469,6 +490,7 @@ section.block {
 /* Timeline type roles: dates (metadata) → employer/school (serif) → job title or degree (the line recruiters scan for) */
 .timeline h3 { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.005em; margin-bottom: 0.2em; }
 .timeline p { color: var(--ink-soft); max-width: 56ch; } /* ~72 characters in Inter */
+.timeline p a { color: var(--navy-800); }
 
 .timeline .org-full {
   font-family: var(--font-body);
@@ -539,7 +561,8 @@ section.block {
 }
 
 .beyond-more { margin: 1.6rem 0 0; }
-.beyond-more a { color: var(--navy-800); font-weight: 500; text-decoration-color: var(--gold); }
+/* inline-flex + gap keeps the underline off the space between icon and text */
+.beyond-more a { display: inline-flex; align-items: center; gap: 0.5em; color: var(--navy-800); font-weight: 500; }
 
 /* Photo tile with caption overlay */
 .beyond-photo {
@@ -643,7 +666,7 @@ section.block {
   font-size: 0.92rem;
   color: var(--on-dark-text);
   text-decoration: underline;
-  text-decoration-color: var(--on-dark-line);
+  text-decoration-color: var(--gold-underline); /* same underline as the hero's links */
 }
 .contact-tertiary:hover { color: var(--cream); text-decoration-color: var(--gold); }
 
@@ -684,8 +707,7 @@ section.block {
 }
 
 .paper p { color: var(--ink-soft); }
-.paper p a { color: var(--navy-800); text-decoration: underline; text-decoration-color: var(--line); }
-.paper p a:hover { text-decoration-color: var(--gold); }
+.paper p a { color: var(--navy-800); }
 
 .paper .fig {
   display: block; /* it's a <span>; without this the frame breaks once the float is removed on phones */
@@ -718,8 +740,7 @@ section.block {
   text-wrap: pretty;
 }
 .pub-list strong { color: var(--navy-900); }
-.pub-list a { color: var(--navy-800); text-decoration: underline; text-decoration-color: var(--line); }
-.pub-list a:hover { text-decoration-color: var(--gold); }
+.pub-list a { color: var(--navy-800); }
 
 /* ---------- Reveal animation ---------- */
 
