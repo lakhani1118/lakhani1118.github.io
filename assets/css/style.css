@@ -670,6 +670,7 @@ section.block {
 .paper p a:hover { text-decoration-color: var(--gold); }
 
 .paper .fig {
+  display: block; /* it's a <span>; without this the frame breaks once the float is removed on phones */
   float: left;
   width: 220px;
   margin: 0 1.4rem 0.6rem 0;
@@ -793,6 +794,7 @@ section.block {
 }
 
 @media (max-width: 480px) {
+  .paper { padding: 1.4rem; }
   .contact-block { padding: calc(2.4rem + var(--wave-h)) 1.6rem 2.4rem; }
   .hero { --wave-h: 28px; }
   .hero .container { padding: 2.5rem 1.5rem calc(2.5rem + var(--wave-h)); }
