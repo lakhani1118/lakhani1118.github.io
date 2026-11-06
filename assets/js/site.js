@@ -54,7 +54,7 @@
       if (active === current) { return; }
       current = active;
       spyLinks.forEach(function (a, i) {
-        if (i === active) { a.setAttribute('aria-current', 'true'); }
+        if (i === active) { a.setAttribute('aria-current', 'location'); }
         else { a.removeAttribute('aria-current'); }
       });
     };
@@ -101,4 +101,7 @@
 
   var yearEl = document.querySelector('[data-year]');
   if (yearEl) { yearEl.textContent = new Date().getFullYear(); }
+
+  // Tells the inline failsafe in <head> that the script ran to the end.
+  window.siteReady = true;
 })();

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
-	<script>document.documentElement.classList.add('js');</script>
+	<script>/* Scroll-in animations only run once site.js has loaded; if it hasn't marked the page ready within 3s (blocked, failed, or an error), drop the 'js' class so all content shows without them. */document.documentElement.classList.add('js');setTimeout(function(){if(!window.siteReady){document.documentElement.classList.remove('js');}},3000);</script>
 	<title>Karim Lakhani, PhD</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Karim Lakhani, PhD — oceanographer turned forward deployed scientist. Senior Forward Deployed Scientist at Albert Invent, leading enterprise technical implementations for scientific R&amp;D teams. PhD from Georgia Tech's School of Earth and Atmospheric Sciences." />
