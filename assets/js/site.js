@@ -35,7 +35,41 @@
     });
   }
 
-  var revealEls = document.querySelectorAll('.reveal, .timeline');
+  // Scrollspy: mark the nav link for the section you're reading (aria-current),
+  // which the CSS shows as a gold underline. Nothing is marked over the hero.
+  var spyLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+  var spySections = spyLinks.map(function (a) { return document.querySelector(a.getAttribute('href')); });
+  if (spyLinks.length && spySections.every(Boolean)) {
+    var current = null;
+    var updateSpy = function () {
+      var line = 72 + window.innerHeight * 0.25; // just below the sticky nav
+      var active = -1;
+      spySections.forEach(function (sec, i) {
+        if (sec.getBoundingClientRect().top <= line) { active = i; }
+      });
+      // At the very bottom, the last (short) section wins even if it can't reach the line
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        active = spySections.length - 1;
+      }
+      if (active === current) { return; }
+      current = active;
+      spyLinks.forEach(function (a, i) {
+        if (i === active) { a.setAttribute('aria-current', 'true'); }
+        else { a.removeAttribute('aria-current'); }
+      });
+    };
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(function () { ticking = false; updateSpy(); });
+      }
+    }, { passive: true });
+    window.addEventListener('resize', updateSpy);
+    updateSpy();
+  }
+
+  var revealEls =document.querySelectorAll('.reveal, .timeline');
   if ('IntersectionObserver' in window && revealEls.length) {
     // Anything already in (or above) the first screen shows instantly, so
     // there's no blank gap or load-time animation. Only content further
