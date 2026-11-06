@@ -344,7 +344,7 @@ p:last-child { margin-bottom: 0; }
   margin-bottom: 1em;
 }
 
-.hero .role a { color: inherit; text-decoration: underline; text-decoration-color: var(--gold-underline); }
+.hero .role a { color: inherit; text-decoration: underline; text-decoration-color: var(--gold-underline); white-space: nowrap; }
 
 .hero-tagline {
   font-size: 1.05rem;
@@ -800,8 +800,9 @@ section.block {
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
-  .about-grid { grid-template-columns: 1fr; }
-  .about-photo { max-width: 340px; margin: 0 auto; }
+  /* Stacked: the portrait leads the section, so a face appears soon after the hero */
+  .about-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+  .about-photo { order: -1; width: min(240px, 66%); }
 }
 
 /* Nav collapses earlier than the rest: below ~820px the full link row collides */
@@ -845,10 +846,36 @@ section.block {
 
 @media (max-width: 480px) {
   .paper { padding: 1.4rem; }
-  .contact-block { padding: calc(2.4rem + var(--wave-h)) 1.6rem 2.4rem; }
-  .hero { --wave-h: 28px; }
-  /* the two hero buttons stack; give them one shared width instead of two ragged ones */
-  .hero-actions .btn { flex: 1 1 100%; justify-content: center; }
-  .hero-contacts { gap: 0.6rem 1.4rem; }
-  .hero .container { padding: 2.5rem 1.5rem calc(2.5rem + var(--wave-h)); }
+  /* Phones: the two dark panels (hero and contact) run edge to edge, a matched
+     pair, with their text on the same 1.5rem gutter as every other section */
+  .hero {
+    --wave-h: 28px;
+    width: 100%;
+    margin-top: 0;
+    border-radius: 0;
+    min-height: 0;
+  }
+  .hero-bg {
+    /* dark where the text is, easing off toward the bottom so the water shows */
+    background-image:
+      linear-gradient(180deg, rgba(7, 15, 30, 0.9) 0%, rgba(10, 22, 42, 0.82) 55%, rgba(13, 28, 52, 0.6) 82%, rgba(47, 109, 104, 0.4) 100%),
+      url('../../images/Beach.jpg');
+    background-position: center 70%;
+  }
+  .hero .container { padding: 2.2rem 1.5rem calc(2.2rem + var(--wave-h)); }
+  .hero h1 { font-size: 2.3rem; }
+  .hero-tagline { font-size: 1rem; }
+  .hero-actions { margin-top: 1.6rem; gap: 0.75rem; }
+  /* buttons share a row when they fit, and each takes the full width when they stack */
+  .hero-actions .btn { flex: 1 1 auto; justify-content: center; }
+  .hero-contacts { gap: 0.6rem 1.4rem; margin-top: 1.3rem; }
+
+  #contact .container { padding: 0; }
+  .contact-block { padding: calc(2.4rem + var(--wave-h)) 1.5rem 2.4rem; border-radius: 0; }
+}
+
+/* Smallest phones: the email button is the widest thing on the page; tighten it so it never clips */
+@media (max-width: 360px) {
+  .contact-actions .btn-lg { padding-left: 1.1em; padding-right: 1.1em; font-size: 0.95rem; }
+  .contact-actions .btn-lg { min-width: 0; overflow-wrap: anywhere; }
 }
