@@ -370,7 +370,6 @@ p:last-child { margin-bottom: 0; }
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
-  text-decoration: none;
   font-size: 0.92rem;
   min-height: 44px; /* full-size tap target; the text stays small */
   color: var(--on-dark-text);
@@ -537,10 +536,12 @@ section.block#contact { padding-bottom: 1.5rem; }
   letter-spacing: 0;
   color: var(--ink-soft);
   margin-left: 0.4em;
+  display: inline-block; /* its own box, so the link underline stays on the short name */
 }
 
-.timeline h3 a { color: inherit; text-decoration: none; }
-.timeline h3 a:hover { color: var(--teal-deep); }
+/* Organisation names link out: same muted-gold underline as the paper titles */
+.timeline h3 a { color: inherit; text-decoration: underline; text-decoration-color: var(--link-underline); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+.timeline h3 a:hover { color: var(--teal-deep); text-decoration-color: var(--gold); }
 
 .timeline .role-title {
   font-family: var(--font-body);
@@ -887,7 +888,7 @@ section.block#contact { padding-bottom: 1.5rem; }
 
 @media (max-width: 760px) {
   /* full institution name goes on its own line under the short name */
-  .timeline .org-full { display: block; margin: 0.25em 0 0; }
+  .timeline .org-full { display: inline-block; width: 100%; margin: 0.25em 0 0; } /* own line, still outside the underline */
   .timeline .role-years { display: block; margin: 0.15em 0 0; }
   .contact-block { flex-direction: column; align-items: stretch; text-align: left; }
   .contact-intro { flex-basis: auto; }
