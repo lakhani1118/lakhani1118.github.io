@@ -340,7 +340,7 @@ p:last-child { margin-bottom: 0; }
 
 .hero-tagline {
   color: var(--on-dark-text);
-  max-width: 34em;
+  max-width: 30em; /* ~70 characters of italic serif per line */
 }
 
 /* Karim's own voice: the first line of the page and the last, set in the serif italic */
@@ -708,13 +708,14 @@ section.block#contact { padding-bottom: 1.5rem; }
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
-  margin-left: 1.2em;
   min-height: 44px; /* full-size tap target */
   padding: 0 0.25rem;
   color: var(--navy-800);
   font-weight: 500;
 }
 .icon-up { transform: rotate(180deg); }
+/* Copyright and Back to top sit side by side, and stack centred when there isn't room */
+.site-footer p { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; column-gap: 1.4em; }
 
 /* ---------- Research papers ---------- */
 
@@ -728,8 +729,9 @@ section.block#contact { padding-bottom: 1.5rem; }
 
 .paper header { margin-bottom: 0.9rem; }
 .paper h3 { font-size: 1.3rem; margin-bottom: 0.15em; }
-.paper h3 a { color: var(--navy-900); text-decoration: none; }
-.paper h3 a:hover { color: var(--teal-deep); }
+/* Paper titles link to the PDFs: same muted-gold underline as every other link */
+.paper h3 a { color: var(--navy-900); text-decoration: underline; text-decoration-color: var(--link-underline); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+.paper h3 a:hover { color: var(--teal-deep); text-decoration-color: var(--gold); }
 
 .paper .status {
   display: inline-block;
@@ -737,6 +739,7 @@ section.block#contact { padding-bottom: 1.5rem; }
   font-weight: 600;
   color: var(--teal-deep);
   margin-bottom: 0.4em;
+  text-wrap: balance; /* even lines on phones instead of a stranded year */
 }
 .paper .status i { font-weight: 500; } /* journal names in italic, as in the citations below */
 
@@ -869,12 +872,17 @@ section.block#contact { padding-bottom: 1.5rem; }
     align-items: stretch;
     text-align: left;
   }
-  .site-nav.is-open .nav-links a { display: block; padding: 0.7rem 0; } /* full-width, ~47px tap rows */
+  .site-nav.is-open .nav-links a { display: block; padding: 0.7rem 0; color: var(--ink); } /* full-width, ~47px tap rows */
 }
 
 /* Smallest phones: drop the monogram so the name and CV button keep breathing room */
 @media (max-width: 360px) {
   .brand-mark { display: none; }
+}
+
+/* Tablets: the contact panel wraps its buttons under the intro; set them side by side so they use the width */
+@media (min-width: 761px) and (max-width: 900px) {
+  .contact-actions { flex-direction: row; flex-wrap: wrap; }
 }
 
 @media (max-width: 760px) {
