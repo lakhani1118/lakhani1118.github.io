@@ -69,7 +69,9 @@
   function durHTML(sec) {
     var p = parts(sec);
     var slot = function (cls, v, u) { return '<span class="' + cls + '">' + (v ? v + '<i>' + u + '</i>' : '') + '</span>'; };
-    return '<span class="dur">' + slot('h', p.h, 'h') + slot('m', p.m, 'm') + slot('s', p.s, 's') + '</span>';
+    // With hours shown, an empty minute slot reads "0m", so "1h 0m 40s" can't be mistaken for 1:40
+    var mins = p.m || (p.h && p.s ? '0' : 0);
+    return '<span class="dur">' + slot('h', p.h, 'h') + slot('m', mins, 'm') + slot('s', p.s, 's') + '</span>';
   }
 
   // Plain words, for labels and screen readers: "1 h 52 min", "23 min 42 s"
@@ -90,6 +92,13 @@
 
   function timeOfDay(ms) {
     return new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  // "just now", "4 min ago", "1 h 12 min ago"
+  function ago(ms) {
+    var min = Math.floor((Date.now() - ms) / 60000);
+    if (min < 1) return 'just now';
+    return durWords(min * 60) + ' ago';
   }
 
   // ---------- Tables ----------
@@ -138,17 +147,40 @@
     });
   });
 
+  // ---------- Timer state ----------
+  // t = { id, f, food, sec, state: running|done, endAt, startedAt, doneAt }
+  // Time left is worked out from endAt (a wall-clock timestamp), so the count
+  // stays right when the tab is in the background or the page is reloaded.
+
+  var t = null;
+
+  function readStored() {
+    var v = null;
+    try { v = JSON.parse(store.get('pasteurTimer')); } catch (e) { v = null; }
+    if (!v || typeof v.sec !== 'number' || !v.state) return null;
+    // Timers saved by the older version of this page (with Pause and Reset)
+    if (v.state === 'paused') { v.state = 'running'; v.endAt = Date.now() + (v.left || 0) * 1000; }
+    if (v.state === 'idle') return null;
+    return v;
+  }
+  t = readStored();
+
+  function tableOf(id) { return id ? id.split('-')[0] : null; }
+
   // ---------- Tabs ----------
   // The hash picks the table (#meat, #poultry) or a single cell (#poultry-142-low),
-  // so a link can point a friend at the exact time you use.
+  // so a link can point a friend at the exact time you use. With no hash, the
+  // page opens on the running timer's table, so its cell is in view.
 
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tabs button'));
   var hash = location.hash.slice(1);
   var linkedCell = /^(meat|poultry)-\d+/.test(hash) ? hash : null;
-  var table = linkedCell ? linkedCell.split('-')[0] : hash;
+  var table = linkedCell ? tableOf(linkedCell) : hash;
   if (table !== 'meat' && table !== 'poultry') {
-    table = store.get('pasteurTable') === 'poultry' ? 'poultry' : 'meat';
+    table = (t && tableOf(t.id)) || (store.get('pasteurTable') === 'poultry' ? 'poultry' : 'meat');
   }
+
+  function setHash(h) { try { history.replaceState(null, '', '#' + h); } catch (e) {} }
 
   function showTable(name, keepHash) {
     table = name;
@@ -163,7 +195,7 @@
       sec.inert = !on;
     });
     store.set('pasteurTable', name);
-    if (!keepHash) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
+    if (!keepHash) setHash(name);
   }
 
   tabs.forEach(function (b, i) {
@@ -179,9 +211,6 @@
   });
 
   // ---------- Timer ----------
-  // t = { id, f, food, sec, state: idle|running|paused|done, endAt, left, startedAt }
-  // Time left is worked out from endAt (a wall-clock timestamp), so the count
-  // stays right when the tab is in the background or the page is reloaded.
 
   var el = {
     bar: document.getElementById('timer'),
@@ -189,33 +218,22 @@
     note: document.getElementById('timer-note'),
     clock: document.getElementById('timer-clock'),
     go: document.getElementById('timer-go'),
-    reset: document.getElementById('timer-reset'),
     close: document.getElementById('timer-close'),
     msg: document.getElementById('timer-msg'),
     msgText: document.getElementById('timer-msg-text'),
-    undo: document.getElementById('timer-undo'),
+    act: document.getElementById('timer-act'),
     status: document.getElementById('timer-status'),
     main: document.getElementById('main')
   };
   var baseTitle = document.title;
-  var t = null, tick = null, wakeLock = null, audio = null;
-  var msgTimer = null, undoState = null, alarm = null;
-
-  function readStored() {
-    var v = null;
-    try { v = JSON.parse(store.get('pasteurTimer')); } catch (e) { v = null; }
-    return v && typeof v.sec === 'number' && v.state ? v : null;
-  }
-  t = readStored();
+  var tick = null, wakeLock = null, audio = null, alarm = null;
+  var msgTimer = null, msgAction = null, askNotify = false;
 
   function save() { if (t) store.set('pasteurTimer', JSON.stringify(t)); else store.del('pasteurTimer'); }
-  function copy(o) { return o ? JSON.parse(JSON.stringify(o)) : null; }
 
   function left() {
-    if (!t) return 0;
-    if (t.state === 'running') return Math.max(0, (t.endAt - Date.now()) / 1000);
-    if (t.state === 'done') return 0;
-    return t.left;
+    if (!t || t.state !== 'running') return 0;
+    return Math.max(0, (t.endAt - Date.now()) / 1000);
   }
 
   function announce(text) { el.status.textContent = text; }
@@ -226,12 +244,13 @@
     });
   }
 
-  // A short line across the bottom of the bar, optionally with Undo
-  function showMsg(text, undoable, ms) {
+  // A line along the bottom of the bar, optionally with one button (Notify me)
+  function showMsg(text, action, ms) {
     clearTimeout(msgTimer);
-    undoState = undoable || null;
+    msgAction = action || null;
     el.msgText.textContent = text;
-    el.undo.hidden = !undoable;
+    el.act.hidden = !action;
+    if (action) el.act.textContent = action.label;
     el.msg.hidden = false;
     paint();
     announce(text);
@@ -239,14 +258,9 @@
   }
   function hideMsg() {
     clearTimeout(msgTimer);
-    undoState = null;
+    msgAction = null;
     el.msg.hidden = true;
     paint();
-  }
-
-  function load(p) {
-    t = { id: p.id, f: p.f, food: p.food, sec: p.sec, state: 'idle', endAt: null, left: p.sec };
-    markPicked();
   }
 
   function paint() {
@@ -256,26 +270,27 @@
       document.title = baseTitle;
       return;
     }
-    var rem = left();
     el.bar.hidden = false;
-    el.bar.dataset.state = t.state;
     el.food.textContent = t.food + ' · ' + tempText(t.f);
-    el.clock.textContent = t.state === 'done' ? 'Done' : clock(rem);
-    el.bar.style.setProperty('--done', String(t.sec ? 1 - rem / t.sec : 1));
 
-    if (t.state === 'idle') el.note.textContent = 'Hold ' + durWords(t.sec);
-    else if (t.state === 'running') el.note.textContent = 'Done at ' + timeOfDay(t.endAt);
-    else if (t.state === 'paused') el.note.textContent = 'Paused';
-    else el.note.textContent = 'Held ' + durWords(t.sec) + '. Pasteurized.';
-
-    // Destructive buttons stay away from the main one: no Clear while counting
-    el.go.textContent = { idle: 'Start', running: 'Pause', paused: 'Resume', done: 'Got it' }[t.state];
-    el.reset.textContent = t.state === 'done' ? 'Restart' : 'Reset';
-    el.reset.hidden = t.state === 'idle';
-    el.close.hidden = t.state === 'running' || t.state === 'done';
-
-    document.title = t.state === 'running' ? clock(rem) + ' · ' + t.food
-      : t.state === 'done' ? 'Done · ' + baseTitle : baseTitle;
+    if (t.state === 'running') {
+      var rem = left();
+      el.bar.dataset.state = 'running';
+      el.clock.textContent = clock(rem);
+      el.bar.style.setProperty('--done', String(t.sec ? 1 - rem / t.sec : 1));
+      el.note.textContent = 'Done at ' + timeOfDay(t.endAt);
+      el.go.hidden = true;
+      el.close.hidden = false;
+      document.title = clock(rem) + ' · ' + t.food;
+    } else {
+      el.bar.dataset.state = 'done';
+      el.clock.textContent = 'Done';
+      el.note.textContent = 'Hold complete · finished ' + timeOfDay(t.doneAt) +
+        (Date.now() - t.doneAt >= 60000 ? ' (' + ago(t.doneAt) + ')' : '');
+      el.go.hidden = false;
+      el.close.hidden = true;
+      document.title = 'Done · ' + baseTitle;
+    }
     el.main.style.setProperty('--dock-h', el.bar.offsetHeight + 'px');
   }
 
@@ -290,47 +305,28 @@
       keepAwake(true);
     } else {
       keepAwake(false);
+      // Done: keep "(12 min ago)" current
+      if (t && t.state === 'done') tick = setInterval(paint, 30000);
     }
   }
 
-  function start() {
+  function start(p) {
     unlockAudio();
-    if ('Notification' in window && Notification.permission === 'default') {
-      try { Notification.requestPermission(); } catch (e) {}
-    }
-    var from = t.state === 'paused' ? t.left : t.sec;
-    if (t.state !== 'paused') t.startedAt = Date.now();
-    t.state = 'running';
-    t.endAt = Date.now() + from * 1000;
+    stopAlarm();
+    hideMsg();
+    t = { id: p.id, f: p.f, food: p.food, sec: p.sec, state: 'running', startedAt: Date.now(), endAt: Date.now() + p.sec * 1000 };
+    setHash(p.id); // the address bar now links to this exact time, ready to share
     save();
     run();
+    markPicked();
     paint();
-    announce('Timer started. Done at ' + timeOfDay(t.endAt) + '.');
-  }
-
-  function pause() {
-    t.left = left();
-    t.state = 'paused';
-    t.endAt = null;
-    save();
-    run();
-    paint();
-    announce('Paused with ' + durWords(Math.ceil(t.left)) + ' left.');
-  }
-
-  function reset() {
-    t.state = 'idle';
-    t.endAt = null;
-    t.left = t.sec;
-    save();
-    run();
-    paint();
+    announce('Timer started for ' + p.food + ' at ' + tempText(p.f) + '. Done at ' + timeOfDay(t.endAt) + '.');
   }
 
   function finish(live) {
+    t.doneAt = t.endAt || Date.now();
     t.state = 'done';
     t.endAt = null;
-    t.left = 0;
     save();
     run();
     hideMsg();
@@ -339,50 +335,48 @@
     if (!live) return; // finished while the page was closed: no alarm on load
     startAlarm();
     if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
-      try { new Notification('Pasteurization timer done', { body: t.food + ' · ' + tempText(t.f) + ' · ' + durWords(t.sec), icon: 'images/favicon_io/android-chrome-192x192.png' }); } catch (e) {}
+      try { new Notification('Hold complete', { body: t.food + ' · ' + tempText(t.f) + ' · ' + durWords(t.sec), icon: 'images/favicon_io/android-chrome-192x192.png' }); } catch (e) {}
     }
   }
 
+  // × or Got it: the timer is gone and the bar closes
   function clear() {
+    if (!t) return;
+    var id = t.id;
     stopAlarm();
     t = null;
     save();
     run();
-    hideMsg();
     markPicked();
-    paint();
+    hideMsg();
     announce('Timer cleared.');
+    // Keyboard focus lands back on the time that was running, not on the page
+    var cell = document.getElementById(id);
+    if (cell && !cell.closest('[inert]')) cell.focus({ preventScroll: true });
   }
 
-  function restore(prev) {
-    t = prev;
-    save();
-    run();
-    markPicked();
-    hideMsg();
-    announce('Undone. ' + t.food + ' at ' + tempText(t.f) + ', ' + durWords(Math.ceil(left())) + ' left.');
-  }
-
-  el.go.addEventListener('click', function () {
-    if (!t) return;
-    if (t.state === 'running') pause();
-    else if (t.state === 'done') clear();
-    else start();
-  });
-  el.reset.addEventListener('click', function () {
-    if (!t) return;
-    if (t.state === 'done') { stopAlarm(); reset(); start(); return; }
-    var prev = copy(t);
-    reset();
-    showMsg('Timer reset.', prev);
-  });
+  el.go.addEventListener('click', clear);
   el.close.addEventListener('click', clear);
-  el.undo.addEventListener('click', function () {
-    if (undoState) restore(undoState);
-    el.go.focus();
+  el.act.addEventListener('click', function () {
+    var a = msgAction;
+    if (a) a.fn();
+    if (t) el.close.focus();
   });
   // Any touch on the bar silences a ringing alarm
   el.bar.addEventListener('pointerdown', stopAlarm);
+
+  // The food line takes you back to the timer's cell in the table
+  function goToCell(id) {
+    var cell = document.getElementById(id);
+    if (!cell) return;
+    showTable(tableOf(id), true);
+    setHash(id);
+    cell.scrollIntoView({ block: 'center' });
+    cell.focus({ preventScroll: true });
+  }
+  el.food.addEventListener('click', function () {
+    if (t) goToCell(t.id);
+  });
 
   // A finger that moved was scrolling the table, not tapping a time
   var downAt = null, moved = false;
@@ -396,35 +390,53 @@
   // One click on a hold time starts its timer. Clicking another while one is
   // counting keeps whichever finishes sooner: a shorter hold takes over from now
   // (36 min at 135°F, then 140°F two minutes in: 34 min left becomes 12 min),
-  // with Undo for a few seconds; a longer one leaves the current count alone.
+  // a longer one leaves the current count alone.
   panels.addEventListener('click', function (e) {
+    var wasMoved = moved && e.detail !== 0; // keyboard clicks never count as scrolls
+    moved = false;
     var b = e.target.closest('.pick');
-    if (!b) return;
-    if (moved) { moved = false; return; }
+    if (!b || wasMoved) return;
+    clearLinked();
     var p = { id: b.dataset.id, f: +b.dataset.f, sec: +b.dataset.sec, food: b.dataset.food };
-    if (t && (t.state === 'running' || t.state === 'paused')) {
+    if (t && t.state === 'running') {
       if (t.id === p.id) return;
       var rem = left();
       if (p.sec < rem) {
-        var prev = copy(t);
+        var fromF = t.f;
         t.id = p.id; t.f = p.f; t.food = p.food; t.sec = p.sec;
-        if (t.state === 'running') t.endAt = Date.now() + p.sec * 1000;
-        else t.left = p.sec;
+        t.endAt = Date.now() + p.sec * 1000;
+        setHash(p.id);
         save();
         markPicked();
-        showMsg('Switched from ' + tempText(prev.f) + ' (' + clock(rem) + ' left).', prev);
+        paint();
+        announce('Switched from ' + tempText(fromF) + ' to ' + tempText(p.f) + ': ' + clock(p.sec) + ' left.'); // screen readers only
       } else {
-        showMsg('Kept current timer: ' + clock(rem) + ' left is shorter than ' + durWords(p.sec) + '.', null, 4000);
+        announce('Kept current timer: ' + clock(rem) + ' left is shorter than ' + clock(p.sec) + '.'); // screen readers only
+        nudge(el.clock);
+        nudge(document.getElementById(t.id));
       }
       return;
     }
-    stopAlarm();
-    hideMsg();
-    load(p);
-    start();
+    start(p);
   });
 
-  // ---------- Alarm, wake lock ----------
+  // Kept: a quick gold pulse on the clock and the running cell, so the tap
+  // visibly lands on the timer that is still counting
+  function nudge(node) {
+    if (!node) return;
+    node.classList.remove('is-kept');
+    void node.offsetWidth; // restart the animation on repeat taps
+    node.classList.add('is-kept');
+    clearTimeout(node.keptTimer);
+    node.keptTimer = setTimeout(function () { node.classList.remove('is-kept'); }, 700);
+  }
+
+  // A cell opened from a shared link stays marked until the first tap anywhere
+  function clearLinked() {
+    document.querySelectorAll('.pick.is-linked').forEach(function (c) { c.classList.remove('is-linked'); });
+  }
+
+  // ---------- Alarm, notifications, wake lock ----------
 
   function unlockAudio() {
     var AC = window.AudioContext || window.webkitAudioContext;
@@ -472,6 +484,22 @@
     el.bar.classList.remove('is-ringing');
   }
 
+  // Notifications are offered the first time you come back to the page with a
+  // timer running: that's when you've learned you might be elsewhere when it ends.
+  // (Browsers only show the permission prompt after a tap, so it's a button.)
+  function maybeOfferNotify() {
+    if (!askNotify || !t || t.state !== 'running') return;
+    if (!('Notification' in window) || Notification.permission !== 'default') return;
+    askNotify = false;
+    showMsg('Get a notification when the hold ends?', {
+      label: 'Notify me',
+      fn: function () {
+        try { Notification.requestPermission(); } catch (e) {}
+        hideMsg();
+      }
+    }, 15000);
+  }
+
   // Keep a phone's screen on while a timer counts, where the browser allows it
   function keepAwake(on) {
     if (!('wakeLock' in navigator)) return;
@@ -489,9 +517,15 @@
   }
 
   document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState !== 'visible' || !t) return;
-    if (t.state === 'running' && left() <= 0) finish(true);
-    else { if (t.state === 'running') keepAwake(true); paint(); }
+    if (!t) return;
+    if (document.visibilityState === 'hidden') {
+      if (t.state === 'running') askNotify = true;
+      return;
+    }
+    if (t.state === 'running' && left() <= 0) { finish(true); return; }
+    if (t.state === 'running') keepAwake(true);
+    paint();
+    maybeOfferNotify();
   });
   window.addEventListener('resize', function () { if (t) paint(); });
 
@@ -505,6 +539,8 @@
     paint();
   });
 
+  document.addEventListener('pointerdown', clearLinked);
+
   // ---------- Go ----------
 
   render();
@@ -515,6 +551,7 @@
   if (linkedCell) {
     var cell = document.getElementById(linkedCell);
     if (cell) {
+      cell.classList.add('is-linked');
       cell.scrollIntoView({ block: 'center' });
       cell.focus({ preventScroll: true });
     }

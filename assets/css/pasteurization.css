@@ -61,16 +61,17 @@
 @media (min-width: 1100px) {
   .tool-body {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 30rem minmax(0, 1fr); /* fixed, so switching tables never shifts the notes */
     column-gap: 3.5rem;
     align-items: start;
   }
+  .tool-body .panel { width: 100%; }
   .tool-body .notes { position: sticky; top: calc(72px + 2rem); padding-top: 4.25rem; }
 }
 
 /* ---------- Panels ---------- */
 
-/* Both panels share one grid cell, so the notes below never jump when switching */
+/* One grid cell for both panels; only the selected one is shown */
 .panels { display: grid; grid-template-columns: minmax(0, 1fr); margin-bottom: 3rem; }
 .panel {
   grid-area: 1 / 1;
@@ -84,44 +85,23 @@
   border-radius: var(--radius);
   padding: 1.75rem 1.75rem 1.25rem;
 }
-.panel[aria-hidden="true"] { visibility: hidden; }
+/* Only the selected table takes up room, so nothing sits in a gap below a shorter one */
+.panel[aria-hidden="true"] { display: none; }
 .panel h2 { font-size: 1.5rem; margin-bottom: 0.2em; }
 .panel .desc { color: var(--ink-soft); font-size: 0.95rem; margin: 0 0 1.25rem; }
 .panel .desc strong { color: var(--ink); font-weight: 600; }
-.panel .src {
-  margin: 1.1rem 0 0;
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--line);
-  color: var(--ink-soft);
-  font-size: 0.85rem;
-  line-height: 1.55;
-  /* never widens the card: wraps to the table's width */
-  width: 0;
-  min-width: 100%;
-}
-.panel .src p { margin: 0 0 0.35rem; }
-.panel .src a { color: var(--navy-800); }
-.src-label {
-  font-weight: 600;
-  color: var(--ink);
-  margin-right: 0.35em;
-}
-.src-label::after { content: ":"; }
 
-/* What low and high fat mean, right under the chicken & turkey heading */
-.fat-key { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: -0.5rem 0 1.25rem; }
-.fat-key div {
-  display: flex;
-  align-items: baseline;
-  gap: 0.45em;
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  background: var(--cream);
-  border: 1px solid var(--line);
-  font-size: 0.9rem;
+/* Fat range under each poultry column name */
+.th-sub {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
 }
-.fat-key dt { font-weight: 600; color: var(--navy-900); }
-.fat-key dd { margin: 0; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 
 /* ---------- Tables ---------- */
 
@@ -190,17 +170,23 @@
 }
 .pick:hover { background: var(--pick-hover); }
 .pick:focus-visible { outline-offset: -2px; }
+.pick[aria-pressed="true"]:focus-visible { outline-color: var(--gold-light); }
+/* A cell opened from a shared link: marked until the first tap */
+.pick.is-linked { box-shadow: inset 0 0 0 2px var(--gold); background: var(--pick-hover); }
 .pick[aria-pressed="true"] { background: var(--navy-900); color: var(--cream); }
 .pick[aria-pressed="true"] .dur i { color: var(--gold-light); }
 
-/* Row + column crosshair, so a temperature / fat lookup reads cleanly */
-.tool tbody tr:hover > * { background: var(--row-hover); }
-.tool tbody tr:hover .temp { box-shadow: inset 2px 0 0 var(--gold); }
-.tool table:has(td:nth-child(2):hover) td:nth-child(2),
-.tool table:has(td:nth-child(3):hover) td:nth-child(3) { background: var(--col-hover); }
-.poultry table:has(td:nth-child(2):hover) thead th:nth-child(2),
-.poultry table:has(td:nth-child(3):hover) thead th:nth-child(3) { color: var(--navy-900); }
-.tool tbody tr:hover td:hover { background: var(--row-hover); }
+/* Row + column crosshair, so a temperature / fat lookup reads cleanly.
+   Pointer devices only: on touch screens a tapped row would stay lit. */
+@media (hover: hover) {
+  .tool tbody tr:hover > * { background: var(--row-hover); }
+  .tool tbody tr:hover .temp { box-shadow: inset 2px 0 0 var(--gold); }
+  .tool table:has(td:nth-child(2):hover) td:nth-child(2),
+  .tool table:has(td:nth-child(3):hover) td:nth-child(3) { background: var(--col-hover); }
+  .poultry table:has(td:nth-child(2):hover) thead th:nth-child(2),
+  .poultry table:has(td:nth-child(3):hover) thead th:nth-child(3) { color: var(--navy-900); }
+  .tool tbody tr:hover td:hover { background: var(--row-hover); }
+}
 
 /* ---------- Notes ---------- */
 
@@ -211,6 +197,12 @@
 .notes li::marker { color: var(--gold); }
 .notes p { color: var(--ink-soft); font-size: 0.95rem; }
 .notes a { color: var(--navy-800); }
+.notes h3 { font-size: 1.05rem; margin: 0 0 0.4em; }
+/* Source: the guide first, then the government documents it cites */
+.notes .cite { margin-bottom: 0.6rem; }
+.notes .refs { list-style: none; padding: 0; margin: 0; font-size: 0.92rem; }
+.notes .refs li { margin: 0 0 0.6rem; padding-left: 0.9rem; border-left: 1px solid var(--line); }
+.notes .ref-for { font-weight: 600; color: var(--ink); }
 
 /* ---------- Timer bar ---------- */
 
@@ -250,20 +242,33 @@
 }
 
 .timer-what { grid-area: what; min-width: 0; }
-.timer-what strong {
+/* The food line doubles as a link back to the timer's cell in the table */
+.timer-food {
   display: block;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 600;
   line-height: 1.25;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.15s ease-out;
 }
+.timer-food:hover { text-decoration-color: var(--gold); }
 .timer-what span { display: block; font-size: 0.88rem; color: var(--on-dark-text); line-height: 1.4; }
 
 .timer-clock {
   grid-area: clock;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(2rem, 4vw, 2.6rem);
+  font-size: clamp(2.75rem, 5vw, 3.5rem); /* big enough for a tablet propped on the counter */
   line-height: 1;
   font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: -0.01em;
@@ -272,7 +277,6 @@
 
 .timer-actions { grid-area: actions; display: flex; align-items: center; gap: 0.5rem; }
 /* Reset sits apart from Pause, so a thumb aimed at one doesn't land on the other */
-#timer-reset { margin-right: 0.75rem; }
 .timer .btn { padding: 0.6em 1.25em; min-height: 44px; }
 .timer .btn-primary { box-shadow: none; min-width: 6.5em; justify-content: center; }
 .timer .btn[hidden] { display: none; }
@@ -293,7 +297,7 @@
 .timer-close:hover { background: rgb(var(--cream-rgb) / 0.1); color: var(--cream); }
 .timer-close svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; fill: none; }
 
-/* Switched / reset / kept: a line under the bar, with Undo when there's something to undo */
+/* The one-time "Notify me" offer: a line under the bar with a button */
 .timer-msg {
   grid-column: 1 / -1;
   display: flex;
@@ -315,6 +319,8 @@
 .timer[data-state="done"] .timer-progress { display: none; }
 .timer[data-state="done"] .timer-clock { color: var(--navy-950); }
 .timer[data-state="done"] .timer-what span { color: var(--navy-800); }
+.timer[data-state="done"] .timer-food:hover { text-decoration-color: var(--navy-900); }
+
 .timer[data-state="done"] .btn-primary { background: var(--navy-900); color: var(--cream); }
 .timer[data-state="done"] .btn-primary:hover { background: var(--navy-700); }
 .timer[data-state="done"] .btn-ghost { background: transparent; border-color: rgb(12 28 52 / 0.45); color: var(--navy-950); }
@@ -338,6 +344,17 @@
 }
 @keyframes ringing {
   50% { background-color: var(--gold-light); }
+}
+
+/* Kept: tapping a longer hold pulses the clock and the running cell once.
+   Colour only, so it also plays with reduced motion. */
+.timer-clock.is-kept { animation: kept 0.6s ease-out; }
+.pick.is-kept { animation: kept-cell 0.6s ease-out; }
+@keyframes kept {
+  30% { color: var(--gold); }
+}
+@keyframes kept-cell {
+  30% { box-shadow: inset 0 0 0 3px var(--gold); }
 }
 @keyframes timer-in {
   from { transform: translate(-50%, 100%); }
@@ -386,7 +403,7 @@
 @media (max-width: 380px) {
   .timer .btn { padding: 0.55em 0.95em; }
   .timer-clock { font-size: 2.75rem; }
-  #timer-reset { margin-right: 0.4rem; }
+  .seg button { padding-left: 0.95em; padding-right: 0.95em; }
   /* Smallest phones: the poultry table still fits without sideways scrolling */
   .tool table { font-size: 0.86rem; }
   .tool thead th { font-size: 0.7rem; letter-spacing: 0.02em; }
@@ -401,7 +418,7 @@
   .seg, .timer, .site-footer { display: none; }
   .panels { display: block; }
   .panel { break-inside: avoid; margin-bottom: 1.5rem; }
-  .panel[aria-hidden="true"] { visibility: visible; }
+  .panel[aria-hidden="true"] { display: block; }
   .tool thead th { position: static; }
   .pick { padding: 0; }
 }
