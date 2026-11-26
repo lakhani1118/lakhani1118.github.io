@@ -1,0 +1,407 @@
+/* ==========================================================================
+   Pasteurization tables (pasteurization-tables.html)
+   Builds on style.css: same palette, type and nav. Only what this page adds.
+   ========================================================================== */
+
+.tool {
+  --row-alt: #fcfaf5;
+  --row-hover: #f5eedb;   /* warm cream: the row you're reading */
+  --col-hover: #faf6ea;   /* fainter: the column you're reading */
+  --pick-hover: #efe5c8;
+  --dock-h: 0px;          /* set by JS while the timer bar is showing */
+  padding: 3rem 0 calc(4rem + var(--dock-h));
+}
+
+/* ---------- Page head ---------- */
+
+.tool-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  margin-bottom: 2rem;
+}
+.tool-head h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 0.2em; }
+.tool-head p { color: var(--ink-soft); max-width: 40em; margin: 0; }
+
+/* ---------- Segmented controls (unit toggle, table tabs) ---------- */
+
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.seg button {
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.45em 1.15em;
+  min-height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease-out, color 0.15s ease-out;
+}
+.seg button:hover { color: var(--navy-900); }
+.seg button[aria-pressed="true"],
+.seg button[aria-selected="true"] { background: var(--navy-900); color: var(--cream); }
+
+.tabs { margin-bottom: 1rem; max-width: 100%; overflow-x: auto; }
+
+/* ---------- Layout ---------- */
+
+/* Wide screens: the table on the left, the notes beside it instead of below */
+@media (min-width: 1100px) {
+  .tool-body {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 3.5rem;
+    align-items: start;
+  }
+  .tool-body .notes { position: sticky; top: calc(72px + 2rem); padding-top: 4.25rem; }
+}
+
+/* ---------- Panels ---------- */
+
+/* Both panels share one grid cell, so the notes below never jump when switching */
+.panels { display: grid; grid-template-columns: minmax(0, 1fr); margin-bottom: 3rem; }
+.panel {
+  grid-area: 1 / 1;
+  align-self: start;
+  justify-self: start;
+  width: fit-content;
+  min-width: min(100%, 30rem);
+  max-width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.75rem 1.75rem 1.25rem;
+}
+.panel[aria-hidden="true"] { visibility: hidden; }
+.panel h2 { font-size: 1.5rem; margin-bottom: 0.2em; }
+.panel .desc { color: var(--ink-soft); font-size: 0.95rem; margin: 0 0 1.25rem; }
+.panel .desc strong { color: var(--ink); font-weight: 600; }
+.panel .src {
+  margin: 1.1rem 0 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  /* never widens the card: wraps to the table's width */
+  width: 0;
+  min-width: 100%;
+}
+.panel .src p { margin: 0 0 0.35rem; }
+.panel .src a { color: var(--navy-800); }
+.src-label {
+  font-weight: 600;
+  color: var(--ink);
+  margin-right: 0.35em;
+}
+.src-label::after { content: ":"; }
+
+/* What low and high fat mean, right under the chicken & turkey heading */
+.fat-key { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: -0.5rem 0 1.25rem; }
+.fat-key div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45em;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  font-size: 0.9rem;
+}
+.fat-key dt { font-weight: 600; color: var(--navy-900); }
+.fat-key dd { margin: 0; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+/* ---------- Tables ---------- */
+
+.scroll { margin: 0 -1.75rem; padding: 0 1.75rem; }
+
+.tool table {
+  width: 100%;
+  min-width: min(100%, 26rem);
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tool th,
+.tool td { padding: 0.5rem 0.75rem; text-align: right; white-space: nowrap; }
+.tool th:first-child,
+.tool td:first-child { text-align: left; padding-left: 0.6rem; }
+.tool td,
+.tool tbody th { background: var(--surface); }
+.tool tbody tr:nth-child(even) > * { background: var(--row-alt); }
+/* Hold-time cells hold a full-size button instead of text */
+.tool td.t { padding: 2px; }
+
+.tool thead th {
+  position: sticky;
+  top: 72px; /* under the sticky site nav */
+  z-index: 2;
+  background: var(--surface);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  vertical-align: bottom;
+}
+
+.temp { font-weight: 600; color: var(--navy-900); }
+.temp .alt { font-weight: 400; color: var(--ink-soft); margin-left: 0.4em; font-size: 0.85em; }
+
+/* Durations: hour / minute / second slots line up down each column */
+.dur { display: inline-flex; justify-content: flex-end; gap: 0.45ch; }
+.dur > span { display: inline-block; text-align: right; }
+.dur > span:empty::before { content: "\200b"; }
+.dur .h { min-width: 2ch; }
+.dur .m { min-width: 3.4ch; }
+.dur .s { min-width: 3ch; }
+.dur i { font-style: normal; color: var(--ink-soft); margin-left: 1px; }
+.instant { display: block; padding: 0.6rem; color: var(--teal-deep); font-weight: 600; }
+
+/* The hold-time buttons: look like table cells until you point at one */
+.pick {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.4rem 0.6rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: right;
+  cursor: pointer;
+  transition: background-color 0.12s ease-out, color 0.12s ease-out;
+}
+.pick:hover { background: var(--pick-hover); }
+.pick:focus-visible { outline-offset: -2px; }
+.pick[aria-pressed="true"] { background: var(--navy-900); color: var(--cream); }
+.pick[aria-pressed="true"] .dur i { color: var(--gold-light); }
+
+/* Row + column crosshair, so a temperature / fat lookup reads cleanly */
+.tool tbody tr:hover > * { background: var(--row-hover); }
+.tool tbody tr:hover .temp { box-shadow: inset 2px 0 0 var(--gold); }
+.tool table:has(td:nth-child(2):hover) td:nth-child(2),
+.tool table:has(td:nth-child(3):hover) td:nth-child(3) { background: var(--col-hover); }
+.poultry table:has(td:nth-child(2):hover) thead th:nth-child(2),
+.poultry table:has(td:nth-child(3):hover) thead th:nth-child(3) { color: var(--navy-900); }
+.tool tbody tr:hover td:hover { background: var(--row-hover); }
+
+/* ---------- Notes ---------- */
+
+.notes { max-width: 62ch; }
+.notes h2 { font-size: 1.3rem; margin-bottom: 0.5em; }
+.notes ul { margin: 0 0 1.5rem; padding-left: 1.1rem; color: var(--ink-soft); }
+.notes li { margin: 0.4rem 0; }
+.notes li::marker { color: var(--gold); }
+.notes p { color: var(--ink-soft); font-size: 0.95rem; }
+.notes a { color: var(--navy-800); }
+
+/* ---------- Timer bar ---------- */
+
+.timer {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 40;
+  transform: translateX(-50%);
+  width: min(calc(100% - 3rem), calc(var(--container) - 3rem));
+  background: var(--navy-900);
+  color: var(--cream);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -18px 40px -24px rgba(8, 20, 38, 0.55);
+  padding: 1rem 1.25rem 1rem 1.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: "what clock actions";
+  align-items: center;
+  gap: 0.5rem 1.75rem;
+  overflow: hidden;
+  transition: background-color 0.4s ease-out, color 0.4s ease-out;
+}
+.timer[hidden] { display: none; }
+.timer :focus-visible { outline-color: var(--gold-light); }
+
+/* Elapsed share of the hold, along the bar's top edge */
+.timer-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 5px;
+  width: 100%;
+  background: var(--gold);
+  transform-origin: left;
+  transform: scaleX(var(--done, 0));
+}
+
+.timer-what { grid-area: what; min-width: 0; }
+.timer-what strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.timer-what span { display: block; font-size: 0.88rem; color: var(--on-dark-text); line-height: 1.4; }
+
+.timer-clock {
+  grid-area: clock;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -0.01em;
+  color: var(--cream);
+}
+
+.timer-actions { grid-area: actions; display: flex; align-items: center; gap: 0.5rem; }
+/* Reset sits apart from Pause, so a thumb aimed at one doesn't land on the other */
+#timer-reset { margin-right: 0.75rem; }
+.timer .btn { padding: 0.6em 1.25em; min-height: 44px; }
+.timer .btn-primary { box-shadow: none; min-width: 6.5em; justify-content: center; }
+.timer .btn[hidden] { display: none; }
+
+.timer-close {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--on-dark-text);
+  cursor: pointer;
+}
+.timer-close[hidden] { display: none; }
+.timer-close:hover { background: rgb(var(--cream-rgb) / 0.1); color: var(--cream); }
+.timer-close svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; stroke-linecap: round; fill: none; }
+
+/* Switched / reset / kept: a line under the bar, with Undo when there's something to undo */
+.timer-msg {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--on-dark-line);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--gold-light);
+}
+.timer-msg[hidden] { display: none; }
+.timer-msg p { margin: 0 auto 0 0; }
+.timer-msg .btn { padding: 0.45em 1.3em; }
+
+/* Done: the whole bar turns Tech Gold, readable from across the kitchen */
+.timer[data-state="done"] { background: var(--gold); color: var(--navy-950); }
+.timer[data-state="done"] .timer-progress { display: none; }
+.timer[data-state="done"] .timer-clock { color: var(--navy-950); }
+.timer[data-state="done"] .timer-what span { color: var(--navy-800); }
+.timer[data-state="done"] .btn-primary { background: var(--navy-900); color: var(--cream); }
+.timer[data-state="done"] .btn-primary:hover { background: var(--navy-700); }
+.timer[data-state="done"] .btn-ghost { background: transparent; border-color: rgb(12 28 52 / 0.45); color: var(--navy-950); }
+.timer[data-state="done"] .btn-ghost:hover { background: rgb(12 28 52 / 0.08); }
+.timer[data-state="done"] :focus-visible { outline-color: var(--navy-950); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .timer { animation: timer-in 320ms var(--ease-out); }
+  .timer-progress { transition: transform 0.25s linear; }
+  /* While the alarm rings, the bar breathes between gold and light gold */
+  .timer.is-ringing { animation: ringing 1.2s ease-in-out infinite; }
+}
+@keyframes ringing {
+  50% { background-color: var(--gold-light); }
+}
+@keyframes timer-in {
+  from { transform: translate(-50%, 100%); }
+  to { transform: translate(-50%, 0); }
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 760px) {
+  /* Phones: a compact header, so the table starts in the top half of the screen */
+  .tool { padding-top: 1.25rem; }
+  .tool-head { margin-bottom: 1rem; gap: 0.75rem 1rem; align-items: center; }
+  .tool-head h1 { font-size: 1.75rem; }
+  .tool-head p { font-size: 0.95rem; line-height: 1.5; }
+  .panel { padding: 1.25rem 1rem 1rem; border-radius: 12px; min-width: 0; width: auto; justify-self: stretch; }
+  .panel h2 { font-size: 1.3rem; }
+  /* Both tables fit the width, so the header row sticks under the nav as you scroll */
+  .scroll { margin: 0 -1rem; padding: 0; }
+  .tool table { min-width: 0; }
+  .tool th,
+  .tool td { padding-left: 0.4rem; padding-right: 0.4rem; }
+  .tool th:first-child,
+  .tool td:first-child { padding-left: 1rem; }
+  .tool td.t { padding: 2px; }
+  .tool td.t:last-child { padding-right: 0.5rem; }
+  .tool th:last-child { padding-right: 0.95rem; }
+  .pick { padding-left: 0.45rem; padding-right: 0.45rem; }
+  .dur { gap: 0.3ch; }
+  .temp .alt { display: block; margin-left: 0; font-size: 0.78rem; line-height: 1.2; }
+
+  .timer {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 0.9rem 0.75rem calc(0.9rem + env(safe-area-inset-bottom)) 1.25rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "what what"
+      "clock actions";
+  }
+  .timer-what { padding-right: 44px; }
+  .timer-close { position: absolute; top: 0.5rem; right: 0.5rem; }
+  /* The clock is what you glance at from across the kitchen */
+  .timer-clock { font-size: 3.25rem; }
+}
+
+@media (max-width: 380px) {
+  .timer .btn { padding: 0.55em 0.95em; }
+  .timer-clock { font-size: 2.75rem; }
+  #timer-reset { margin-right: 0.4rem; }
+  /* Smallest phones: the poultry table still fits without sideways scrolling */
+  .tool table { font-size: 0.86rem; }
+  .tool thead th { font-size: 0.7rem; letter-spacing: 0.02em; }
+  .tool th:first-child,
+  .tool td:first-child { padding-left: 0.8rem; }
+  .tool td.t:last-child { padding-right: 0.3rem; }
+  .tool th:last-child { padding-right: 0.75rem; }
+  .timer .btn-primary { min-width: 0; }
+}
+
+@media print {
+  .seg, .timer, .site-footer { display: none; }
+  .panels { display: block; }
+  .panel { break-inside: avoid; margin-bottom: 1.5rem; }
+  .panel[aria-hidden="true"] { visibility: visible; }
+  .tool thead th { position: static; }
+  .pick { padding: 0; }
+}

@@ -7,8 +7,10 @@ Source for [klakhani.com](https://klakhani.com/), the personal site of Karim Lak
 | Path | Contents |
 | --- | --- |
 | `index.html` | The whole page, including inlined SVG icons and meta and link-preview tags |
-| `assets/css/style.css` | All styles |
+| `assets/css/style.css` | Site-wide styles |
 | `assets/js/site.js` | Mobile nav toggle and scroll-in animations |
+| `pasteurization-tables.html` | Sous vide pasteurization tables with a hold-time timer (linked as Resources in the nav) |
+| `assets/css/pasteurization.css`, `assets/js/pasteurization.js` | That page's styles, table data and timer |
 | `files/` | CV and publication PDFs |
 | `images/` | Photos, the link-preview image (`og-image.jpg`, 1200×630), and favicons (`favicon_io/`) |
 | `CNAME` | Custom domain for GitHub Pages |
