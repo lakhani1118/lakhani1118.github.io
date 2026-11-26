@@ -6,7 +6,6 @@
 .tool {
   --row-alt: #fcfaf5;
   --row-hover: #f5eedb;   /* warm cream: the row you're reading */
-  --col-hover: #faf6ea;   /* fainter: the column you're reading */
   --pick-hover: #efe5c8;
   --dock-h: 0px;          /* set by JS while the timer bar is showing */
   padding: 3rem 0 calc(4rem + var(--dock-h));
@@ -170,22 +169,15 @@
 }
 .pick:hover { background: var(--pick-hover); }
 .pick:focus-visible { outline-offset: -2px; }
-.pick[aria-pressed="true"]:focus-visible { outline-color: var(--gold-light); }
-/* A cell opened from a shared link: marked until the first tap */
+/* A cell opened from a shared link: marked until the first tap.
+   The timed cell itself gets no styling: once it's running, the timer is what matters. */
 .pick.is-linked { box-shadow: inset 0 0 0 2px var(--gold); background: var(--pick-hover); }
-.pick[aria-pressed="true"] { background: var(--navy-900); color: var(--cream); }
-.pick[aria-pressed="true"] .dur i { color: var(--gold-light); }
 
-/* Row + column crosshair, so a temperature / fat lookup reads cleanly.
+/* Row highlight, so the temperature you're reading stays clear.
    Pointer devices only: on touch screens a tapped row would stay lit. */
 @media (hover: hover) {
   .tool tbody tr:hover > * { background: var(--row-hover); }
   .tool tbody tr:hover .temp { box-shadow: inset 2px 0 0 var(--gold); }
-  .tool table:has(td:nth-child(2):hover) td:nth-child(2),
-  .tool table:has(td:nth-child(3):hover) td:nth-child(3) { background: var(--col-hover); }
-  .poultry table:has(td:nth-child(2):hover) thead th:nth-child(2),
-  .poultry table:has(td:nth-child(3):hover) thead th:nth-child(3) { color: var(--navy-900); }
-  .tool tbody tr:hover td:hover { background: var(--row-hover); }
 }
 
 /* ---------- Notes ---------- */
@@ -346,15 +338,16 @@
   50% { background-color: var(--gold-light); }
 }
 
-/* Kept: tapping a longer hold pulses the clock and the running cell once.
+/* Kept: tapping a longer hold pulses the clock gold once.
    Colour only, so it also plays with reduced motion. */
 .timer-clock.is-kept { animation: kept 0.6s ease-out; }
-.pick.is-kept { animation: kept-cell 0.6s ease-out; }
 @keyframes kept {
   30% { color: var(--gold); }
 }
-@keyframes kept-cell {
-  30% { box-shadow: inset 0 0 0 3px var(--gold); }
+/* Declined: the longer hold you tapped flashes a pale red fill */
+.pick.is-declined { animation: declined-cell 0.6s ease-out; }
+@keyframes declined-cell {
+  30% { background-color: #f6d9d3; }
 }
 @keyframes timer-in {
   from { transform: translate(-50%, 100%); }

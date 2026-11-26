@@ -68,6 +68,9 @@
   // Each unit gets its own fixed-width slot, so values align by unit down a column
   function durHTML(sec) {
     var p = parts(sec);
+    // Exactly a minute reads "60s", so the short times at the bottom of a column
+    // step down 1m 12s, 60s, 48s instead of a lone "1m" between them
+    if (Math.round(sec) === 60) p = { h: 0, m: 0, s: 60 };
     var slot = function (cls, v, u) { return '<span class="' + cls + '">' + (v ? v + '<i>' + u + '</i>' : '') + '</span>'; };
     // With hours shown, an empty minute slot reads "0m", so "1h 0m 40s" can't be mistaken for 1:40
     var mins = p.m || (p.h && p.s ? '0' : 0);
@@ -118,7 +121,7 @@
     if (sec === 0) return '<td><span class="instant">Instant</span></td>';
     return '<td class="t"><button type="button" class="pick" id="' + id + '" data-id="' + id + '" data-f="' + f +
       '" data-sec="' + sec + '" data-food="' + food + '" aria-pressed="false" aria-label="' +
-      food + ' at ' + tempText(f) + ': ' + durWords(sec) + '">' + durHTML(sec) + '</button></td>';
+      food + ' at ' + tempText(f) + ': ' + (Math.round(sec) === 60 ? '60 s' : durWords(sec)) + '">' + durHTML(sec) + '</button></td>';
   }
 
   function render() {
@@ -176,6 +179,13 @@
   var hash = location.hash.slice(1);
   var linkedCell = /^(meat|poultry)-\d+/.test(hash) ? hash : null;
   var table = linkedCell ? tableOf(linkedCell) : hash;
+  // A refresh is not someone following a link: the cell hash is left over from
+  // your own timer, so open at the top with nothing marked
+  var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+  if (nav && nav.type === 'reload') {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    if (linkedCell) { linkedCell = null; try { history.replaceState(null, '', '#' + table); } catch (e) {} }
+  }
   if (table !== 'meat' && table !== 'poultry') {
     table = (t && tableOf(t.id)) || (store.get('pasteurTable') === 'poultry' ? 'poultry' : 'meat');
   }
@@ -413,22 +423,25 @@
       } else {
         announce('Kept current timer: ' + clock(rem) + ' left is shorter than ' + clock(p.sec) + '.'); // screen readers only
         nudge(el.clock);
-        nudge(document.getElementById(t.id));
+        nudge(b, 'is-declined');
       }
       return;
     }
     start(p);
   });
 
-  // Kept: a quick gold pulse on the clock and the running cell, so the tap
-  // visibly lands on the timer that is still counting
-  function nudge(node) {
+  // Kept: a quick gold pulse on the clock, so the tap visibly lands on the
+  // timer that is still counting; the tapped cell gets a pale red flash
+  // ('is-declined') to show it was not taken
+  function nudge(node, cls) {
     if (!node) return;
-    node.classList.remove('is-kept');
+    cls = cls || 'is-kept';
+    node.classList.remove(cls);
     void node.offsetWidth; // restart the animation on repeat taps
-    node.classList.add('is-kept');
-    clearTimeout(node.keptTimer);
-    node.keptTimer = setTimeout(function () { node.classList.remove('is-kept'); }, 700);
+    node.classList.add(cls);
+    node.nudgeTimers = node.nudgeTimers || {};
+    clearTimeout(node.nudgeTimers[cls]);
+    node.nudgeTimers[cls] = setTimeout(function () { node.classList.remove(cls); }, 700);
   }
 
   // A cell opened from a shared link stays marked until the first tap anywhere
@@ -548,6 +561,7 @@
   if (t && t.state === 'running' && left() <= 0) finish(false);
   run();
   paint();
+  if (nav && nav.type === 'reload') window.scrollTo(0, 0);
   if (linkedCell) {
     var cell = document.getElementById(linkedCell);
     if (cell) {
