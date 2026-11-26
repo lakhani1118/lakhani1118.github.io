@@ -208,7 +208,7 @@ p:last-child { margin-bottom: 0; }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: clamp(1.25rem, 2.2vw, 2rem);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -599,7 +599,7 @@ section.block#contact { padding-bottom: 1.5rem; }
   gap: 1.6rem;
 }
 
-.beyond-more { margin: 1.6rem 0 0; }
+.beyond-more { margin: 1.6rem 0 0; display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; }
 /* inline-flex + gap keeps the underline off the space between icon and text */
 .beyond-more a { display: inline-flex; align-items: center; gap: 0.5em; color: var(--navy-800); font-weight: 500; }
 
@@ -851,8 +851,8 @@ section.block#contact { padding-bottom: 1.5rem; }
   .about-photo { width: auto; }
 }
 
-/* Nav collapses earlier than the rest: below ~820px the full link row collides */
-@media (max-width: 860px) {
+/* Nav collapses earlier than the rest: below ~960px the full link row collides */
+@media (max-width: 980px) {
   .nav-links { display: none; }
   .nav-toggle { display: flex; }
   /* The CV stays in the sticky bar on phones, just more compact */
