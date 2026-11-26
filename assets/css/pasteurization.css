@@ -8,7 +8,7 @@
   --row-hover: #f5eedb;   /* warm cream: the row you're reading */
   --pick-hover: #efe5c8;
   --dock-h: 0px;          /* set by JS while the timer bar is showing */
-  padding: 3rem 0 calc(4rem + var(--dock-h));
+  padding: 3rem 0 calc(2.5rem + var(--dock-h));
 }
 
 /* ---------- Page head ---------- */
@@ -64,6 +64,9 @@
     column-gap: 3.5rem;
     align-items: start;
   }
+  /* No gap under the table here, so the sticky notes stop level with the
+     table's bottom edge instead of 3rem past it */
+  .tool-body .panels { margin-bottom: 0; }
   .tool-body .panel { width: 100%; }
   .tool-body .notes { position: sticky; top: calc(72px + 2rem); padding-top: 4.25rem; }
 }
