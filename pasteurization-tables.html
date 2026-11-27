@@ -24,12 +24,33 @@
 	<link rel="icon" type="image/png" sizes="32x32" href="images/favicon_io/favicon-32x32.png">
 	<link rel="apple-touch-icon" sizes="180x180" href="images/favicon_io/apple-touch-icon.png">
 	<link rel="manifest" href="images/favicon_io/site.webmanifest">
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-FHH1Y7DK5V"></script>
 	<script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-FHH1Y7DK5V');
+	// Google Analytics, skipped for the site owner and for local previews.
+	// Visit any page with ?notrack to stop counting this browser, ?track to resume.
+	(function () {
+		var id = 'G-FHH1Y7DK5V', key = 'ga-optout', off = false;
+		window.dataLayer = window.dataLayer || [];
+		window.gtag = function () { dataLayer.push(arguments); };
+		try {
+			var p = new URLSearchParams(location.search), msg = '';
+			if (p.has('notrack')) { localStorage.setItem(key, '1'); msg = 'Analytics off for this browser. Visit ?track to turn it back on.'; }
+			else if (p.has('track')) { localStorage.removeItem(key); msg = 'Analytics on for this browser.'; }
+			if (msg) {
+				p.delete('notrack'); p.delete('track');
+				history.replaceState(null, '', location.pathname + (p.toString() ? '?' + p : '') + location.hash);
+				alert(msg);
+			}
+			off = localStorage.getItem(key) === '1';
+		} catch (e) {}
+		var local = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+		if (off || local) { window['ga-disable-' + id] = true; return; }
+		gtag('js', new Date());
+		gtag('config', id);
+		var s = document.createElement('script');
+		s.async = true;
+		s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+		document.head.appendChild(s);
+	})();
 	</script>
 </head>
 <body>
